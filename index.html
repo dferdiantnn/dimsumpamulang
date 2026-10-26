@@ -36,21 +36,15 @@
           animation: {
             'float-slow': 'float 4s ease-in-out infinite',
             'pulse-glow': 'pulseGlow 2.5s infinite',
-            'steam': 'steam 3s ease-out infinite',
           },
           keyframes: {
             float: {
               '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-8px)' },
+              '50%': { transform: 'translateY(-6px)' },
             },
             pulseGlow: {
               '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
               '50%': { opacity: '0.8', transform: 'scale(1.04)' },
-            },
-            steam: {
-              '0%': { opacity: '0', transform: 'translateY(0) scale(0.8)' },
-              '50%': { opacity: '0.4', transform: 'translateY(-20px) scale(1.1)' },
-              '100%': { opacity: '0', transform: 'translateY(-40px) scale(1.3)' },
             }
           }
         }
@@ -75,14 +69,8 @@
       --progress-mask: transparent;
     }
 
-    /* Hilangkan watermark focus outline */
     model-viewer:focus {
       outline: none;
-    }
-
-    /* Efek tekstur poster bergaris halus */
-    .poster-bg {
-      background: radial-gradient(circle at 50% 30%, #ff5c00 0%, #d43800 45%, #180800 80%, #0c0400 100%);
     }
 
     /* Efek garis pilar tengah oranye seperti poster */
@@ -176,17 +164,19 @@
           <!-- Subtle Glow Halo di Belakang 3D -->
           <div class="absolute inset-4 rounded-full bg-gradient-to-t from-brand-yellow/30 to-brand-orange/40 blur-2xl animate-pulse-glow -z-0"></div>
 
-          <!-- Web Component Model Viewer -->
+          <!-- Web Component Model Viewer (Optimized 3.4MB - Super Fast) -->
           <model-viewer
             id="dimsumViewer"
             src="./dimsum-3d.glb"
             alt="3D Dimsum Goreng Keju Lumer"
+            loading="eager"
+            reveal="auto"
             camera-controls
             auto-rotate
             rotation-per-second="25deg"
-            auto-rotate-delay="1000"
-            shadow-intensity="1.6"
-            shadow-softness="0.7"
+            auto-rotate-delay="500"
+            shadow-intensity="1.5"
+            shadow-softness="0.8"
             exposure="1.15"
             interaction-prompt="none"
             camera-orbit="0deg 55deg 105%"
@@ -194,17 +184,16 @@
             max-camera-orbit="auto 85deg 140%"
             class="z-10 cursor-grab active:cursor-grabbing"
           >
-            <!-- Custom Loading Slot -->
-            <div slot="poster" class="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-black/30 backdrop-blur-sm rounded-full">
-              <div class="w-12 h-12 border-4 border-brand-orange border-t-transparent rounded-full animate-spin mb-3"></div>
-              <p class="text-xs font-bold text-white tracking-wide">Memuat Model 3D Dimsum...</p>
-              <p class="text-[10px] text-white/70">Tekstur PBR Ultra Crisp</p>
+            <!-- Minimalist Fast Spinner -->
+            <div slot="poster" class="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-black/20 backdrop-blur-sm rounded-full">
+              <div class="w-10 h-10 border-3 border-brand-orange border-t-transparent rounded-full animate-spin mb-2"></div>
+              <p class="text-xs font-bold text-white tracking-wide">Memuat 3D...</p>
             </div>
 
             <!-- AR Button (Khusus HP yang support WebXR / QuickLook) -->
             <button slot="ar-button" class="absolute top-2 right-2 bg-black/60 hover:bg-black/90 text-white text-[11px] font-bold px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-md flex items-center gap-1.5 shadow-lg active:scale-95 transition">
               <span>📱</span>
-              <span>Lihat di Meja (AR)</span>
+              <span>Lihat AR</span>
             </button>
           </model-viewer>
         </div>
@@ -238,7 +227,7 @@
             </div>
             <p class="text-[11px] font-bold text-neutral-800 mt-0.5 flex items-center gap-1">
               <span>🧀</span>
-              <span>Keju Mozzarella Molor + Saus Cocol</span>
+              <span>Keju Mozzarella Lumer Molor</span>
             </p>
           </div>
 
@@ -253,7 +242,7 @@
         </div>
       </div>
 
-      <!-- ==================== FORM PEMESANAN & HITUNG TOTAL ==================== -->
+      <!-- ==================== FORM PEMESANAN (Hanya Porsi & Catatan) ==================== -->
       <div id="pesan" class="bg-brand-card/95 backdrop-blur-xl border border-white/10 rounded-3xl p-5 text-left shadow-2xl space-y-4">
         
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
@@ -269,7 +258,7 @@
         <!-- Selector Jumlah Porsi -->
         <div class="bg-black/40 border border-white/10 p-3.5 rounded-2xl flex items-center justify-between">
           <div>
-            <span class="text-xs font-semibold text-neutral-300 block">Jumlah Pesanan:</span>
+            <span class="text-xs font-semibold text-neutral-300 block">Jumlah Porsi:</span>
             <span id="pcsInfo" class="text-[11px] text-brand-yellow font-bold">5 Pcs Dimsum Goreng</span>
           </div>
           <div class="flex items-center gap-3">
@@ -283,28 +272,13 @@
           </div>
         </div>
 
-        <!-- Pilihan Saus / Sambal -->
-        <div>
-          <label class="text-xs font-semibold text-neutral-300 mb-1.5 block">Pilihan Saus Cocol:</label>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-black/30 border border-white/10 cursor-pointer hover:border-brand-orange transition">
-              <input type="radio" name="saus" value="Saus Bangkok Gurih Pedas" checked class="accent-brand-orange" />
-              <span class="font-medium text-neutral-200">🌶️ Saus Bangkok</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-black/30 border border-white/10 cursor-pointer hover:border-brand-orange transition">
-              <input type="radio" name="saus" value="Mayonaise Keju Creamy" class="accent-brand-orange" />
-              <span class="font-medium text-neutral-200">🧀 Mayo Creamy</span>
-            </label>
-          </div>
-        </div>
-
         <!-- Catatan Khusus -->
         <div>
-          <label class="text-xs font-semibold text-neutral-300 mb-1.5 block">Catatan Tambahan (Opsional):</label>
+          <label class="text-xs font-semibold text-neutral-300 mb-1.5 block">Catatan Pesanan (Opsional):</label>
           <input 
             type="text" 
             id="catatanInput" 
-            placeholder="Contoh: Goreng agak kering ya kak, saus banyakin" 
+            placeholder="Contoh: Goreng agak garing ya kak" 
             class="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-brand-orange transition"
           />
         </div>
@@ -312,12 +286,9 @@
         <!-- Ringkasan Total Harga -->
         <div class="p-3.5 bg-gradient-to-r from-orange-950/40 to-neutral-900 border border-brand-orange/30 rounded-2xl flex items-center justify-between">
           <div>
-            <span class="text-[11px] text-neutral-400 block font-medium">Total Pembayaran:</span>
+            <span class="text-[11px] text-neutral-400 block font-medium">Total Harga:</span>
             <span id="totalDisplay" class="font-title font-black text-2xl text-brand-yellow">Rp 20.000</span>
           </div>
-          <span class="text-[10px] text-neutral-400 bg-white/5 px-2.5 py-1 rounded-md border border-white/10">
-            Belum termasuk ongkir
-          </span>
         </div>
 
         <!-- Tombol Utama Pesan Sekarang (WhatsApp) Sesuai Poster -->
@@ -331,49 +302,13 @@
         </button>
 
         <p class="text-center text-[11px] text-neutral-400 font-medium">
-          Official Contact: <span class="text-brand-yellow font-bold">0896-6970-0178</span>
-        </p>
-      </div>
-
-      <!-- ==================== 4 PILAR KENIKMATAN ==================== -->
-      <div class="mt-8 grid grid-cols-2 gap-3 text-left">
-        <div class="bg-neutral-900/80 border border-white/10 p-3.5 rounded-2xl">
-          <div class="text-2xl mb-1">🧀</div>
-          <h4 class="font-title font-bold text-sm text-white">Mozzarella Molor</h4>
-          <p class="text-[11px] text-neutral-400 mt-0.5">Keju asli melimpah, ditarik molor panjang bikin puas.</p>
-        </div>
-        <div class="bg-neutral-900/80 border border-white/10 p-3.5 rounded-2xl">
-          <div class="text-2xl mb-1">🥟</div>
-          <h4 class="font-title font-bold text-sm text-white">Kulit Super Crispy</h4>
-          <p class="text-[11px] text-neutral-400 mt-0.5">Digoreng garing renyah keemasan, krenyes di tiap gigitan.</p>
-        </div>
-        <div class="bg-neutral-900/80 border border-white/10 p-3.5 rounded-2xl">
-          <div class="text-2xl mb-1">🌶️</div>
-          <h4 class="font-title font-bold text-sm text-white">Saus Cocol Juara</h4>
-          <p class="text-[11px] text-neutral-400 mt-0.5">Racikan bumbu saus spesial manis, asam, gurih, dan pedas.</p>
-        </div>
-        <div class="bg-neutral-900/80 border border-white/10 p-3.5 rounded-2xl">
-          <div class="text-2xl mb-1">⚡</div>
-          <h4 class="font-title font-bold text-sm text-white">Goreng Dadakan</h4>
-          <p class="text-[11px] text-neutral-400 mt-0.5">Freshly fried saat ada pesanan, sampai di tangan tetap hangat.</p>
-        </div>
-      </div>
-
-      <!-- ==================== CARA SIMPAN & HANGATKAN ==================== -->
-      <div class="mt-4 bg-black/40 border border-white/10 p-4 rounded-2xl text-left text-xs space-y-1.5">
-        <div class="flex items-center gap-2 text-brand-yellow font-bold text-xs">
-          <span>💡</span>
-          <span>Tips Makan Terbaik:</span>
-        </div>
-        <p class="text-neutral-300 text-[11px] leading-relaxed">
-          Paling nikmat dimakan selagi hangat agar kejunya molor maksimal. Kalau sudah dingin, cukup panaskan di teflon tanpa minyak selama 2 menit atau air fryer 160°C selama 3 menit!
+          Contact WhatsApp: <span class="text-brand-yellow font-bold">0896-6970-0178</span>
         </p>
       </div>
 
       <!-- ==================== FOOTER ==================== -->
-      <footer class="mt-8 pt-6 border-t border-white/10 text-center text-[11px] text-neutral-500 space-y-1">
+      <footer class="mt-8 pt-6 border-t border-white/10 text-center text-[11px] text-neutral-500">
         <p class="font-semibold text-neutral-400">© 2026 Dimsum Goreng Keju Lumer. All rights reserved.</p>
-        <p>Bisa pesan via GoSend, GrabExpress, & ShopeeXpress Instant.</p>
       </footer>
 
     </section>
@@ -439,14 +374,8 @@
       updatePrice();
     });
 
-    function getSelectedSaus() {
-      const checked = document.querySelector('input[name="saus"]:checked');
-      return checked ? checked.value : "Saus Bangkok Gurih Pedas";
-    }
-
     function sendWhatsAppOrder() {
       const total = qty * PRICE_PER_PORTION;
-      const saus = getSelectedSaus();
       const catatan = catatanInput.value.trim() || "-";
 
       const message = 
@@ -455,11 +384,10 @@
 Detail Pesanan:
 • Menu: Dimsum Goreng Keju Lumer (Isi 5 pcs)
 • Jumlah: ${qty} Porsi (${qty * 5} pcs)
-• Pilihan Saus: ${saus}
 • Catatan: ${catatan}
 • Total Harga: Rp ${total.toLocaleString("id-ID")}
 
-Mohon info ongkir dan nomor rekening/e-wallet untuk pembayarannya ya kak, terima kasih! 🙏`;
+Mohon infonya ya kak, terima kasih! 🙏`;
 
       // Trigger party confetti!
       confetti({
