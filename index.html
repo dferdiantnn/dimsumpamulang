@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dimsum Goreng Keju Lumer • Sensasi Renyah & Molor 3D</title>
+  <meta name="description" content="Dimsum Goreng Keju Lumer Rp 20k Isi 5. Kulit super renyah dengan lelehan keju mozzarella premium molor. Pesan langsung via WhatsApp!" />
+
+  <!-- Favicon / Touch Icon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥟</text></svg>">
+
+  <!-- Google Fonts: Fredoka & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#ff5400',
+              deepOrange: '#e04000',
+              yellow: '#ffb703',
+              dark: '#0f0f11',
+              card: '#18181c'
+            }
+          },
+          fontFamily: {
+            title: ['Fredoka', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          animation: {
+            'float-slow': 'float 4s ease-in-out infinite',
+            'pulse-glow': 'pulseGlow 2.5s infinite',
+            'steam': 'steam 3s ease-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+              '50%': { opacity: '0.8', transform: 'scale(1.04)' },
+            },
+            steam: {
+              '0%': { opacity: '0', transform: 'translateY(0) scale(0.8)' },
+              '50%': { opacity: '0.4', transform: 'translateY(-20px) scale(1.1)' },
+              '100%': { opacity: '0', transform: 'translateY(-40px) scale(1.3)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Model Viewer (3D Web Component) -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <!-- Canvas Confetti for Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* Styling khusus Model Viewer agar menyatu dengan poster */
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+      outline: none;
+      --progress-bar-color: #ff5400;
+      --progress-mask: transparent;
+    }
+
+    /* Hilangkan watermark focus outline */
+    model-viewer:focus {
+      outline: none;
+    }
+
+    /* Efek tekstur poster bergaris halus */
+    .poster-bg {
+      background: radial-gradient(circle at 50% 30%, #ff5c00 0%, #d43800 45%, #180800 80%, #0c0400 100%);
+    }
+
+    /* Efek garis pilar tengah oranye seperti poster */
+    .poster-beam {
+      background: linear-gradient(180deg, #ff6b1a 0%, #ea580c 40%, #c2410c 75%, #9a3412 100%);
+      box-shadow: 0 0 60px rgba(255, 84, 0, 0.4);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f0f11;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff5400;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+
+<body class="bg-brand-dark text-white font-sans antialiased selection:bg-brand-orange selection:text-white pb-28 md:pb-16">
+
+  <!-- ==================== HEADER BAR ==================== -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-black/60 backdrop-blur-md border-b border-white/10">
+    <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl animate-bounce">🥟</span>
+        <div>
+          <h1 class="font-title font-bold text-base leading-tight text-white tracking-wide">DIMSUM KEJU</h1>
+          <p class="text-[10px] text-brand-yellow font-semibold tracking-wider uppercase">Crispy & Molor 100%</p>
+        </div>
+      </div>
+      <a href="#pesan" class="px-3.5 py-1.5 bg-brand-orange hover:bg-brand-deepOrange text-white text-xs font-bold rounded-full transition shadow-lg shadow-brand-orange/30 flex items-center gap-1.5 active:scale-95">
+        <span>Order WA</span>
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.074-2.115-.515-1.748-.724-2.883-2.493-2.97-2.608-.088-.116-.708-.941-.708-1.792s.448-1.27.607-1.442c.16-.172.348-.215.465-.215.116 0 .232.001.332.006.107.006.25.04.39.377.144.348.492 1.2.535 1.288.043.088.072.19.014.305-.058.116-.088.19-.174.29-.088.102-.186.226-.265.304-.088.087-.179.182-.077.357.102.175.452.744.97 1.206.666.594 1.228.777 1.402.864.175.088.277.073.38-.044.102-.116.436-.508.552-.682.117-.174.233-.145.394-.087.16.058 1.017.48 1.192.567.175.087.292.13.335.203.044.072.044.42-.1.825z"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN POSTER CONTAINER ==================== -->
+  <main class="max-w-md mx-auto pt-14 min-h-screen relative overflow-hidden bg-brand-dark">
+
+    <!-- HERO POSTER SECTION (Sesuai Desain Poster Asli) -->
+    <section class="relative pt-6 pb-8 px-4 text-center">
+      
+      <!-- Latar Belakang Balok Oranye Tengah (Seperti Desain Flyer) -->
+      <div class="absolute inset-x-8 top-0 bottom-12 poster-beam rounded-3xl opacity-95 -z-10"></div>
+      
+      <!-- Efek Cahaya Radial -->
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-72 h-72 bg-brand-yellow/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+      <!-- Icon Dumpling Kiri-Kanan -->
+      <div class="flex items-center justify-between px-6 pt-2 mb-1">
+        <div class="text-white/80 flex items-center gap-1 text-xs font-semibold bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
+          <span>🥟</span>
+          <span>Crispy Bites</span>
+        </div>
+        <div class="text-white/80 flex items-center gap-1 text-xs font-semibold bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
+          <span>🔥</span>
+          <span>Goreng Panas</span>
+        </div>
+      </div>
+
+      <!-- Judul Utama (Typo Bold Sesuai Poster) -->
+      <div class="mt-2 space-y-1">
+        <h2 class="font-title font-extrabold text-3xl md:text-4xl text-white tracking-wider drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] uppercase">
+          DIMSUM GORENG
+        </h2>
+        <div class="inline-block relative">
+          <h2 class="font-title font-extrabold text-4xl md:text-5xl text-white tracking-widest drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] uppercase">
+            KEJU LUMER
+          </h2>
+          <!-- Highlight Coreng Bawah -->
+          <div class="absolute -bottom-1 inset-x-0 h-1.5 bg-brand-yellow rounded-full -rotate-1 shadow-md"></div>
+        </div>
+      </div>
+
+      <!-- Tagline Kelezatan -->
+      <p class="text-xs text-orange-100 font-medium mt-3 px-6 drop-shadow">
+        "Sensasi renyah di luar, keju mozzarella molor meleleh di dalam!"
+      </p>
+
+      <!-- ==================== 3D INTERACTIVE VIEWER STAGE ==================== -->
+      <div class="relative my-4 flex justify-center items-center">
+        
+        <!-- Piring 3D Interaktif Container -->
+        <div class="relative w-[340px] h-[340px] sm:w-[380px] sm:h-[380px] mx-auto rounded-full flex items-center justify-center">
+          
+          <!-- Subtle Glow Halo di Belakang 3D -->
+          <div class="absolute inset-4 rounded-full bg-gradient-to-t from-brand-yellow/30 to-brand-orange/40 blur-2xl animate-pulse-glow -z-0"></div>
+
+          <!-- Web Component Model Viewer -->
+          <model-viewer
+            id="dimsumViewer"
+            src="./dimsum-3d.glb"
+            alt="3D Dimsum Goreng Keju Lumer"
+            camera-controls
+            auto-rotate
+            rotation-per-second="25deg"
+            auto-rotate-delay="1000"
+            shadow-intensity="1.6"
+            shadow-softness="0.7"
+            exposure="1.15"
+            interaction-prompt="none"
+            camera-orbit="0deg 55deg 105%"
+            min-camera-orbit="auto auto 70%"
+            max-camera-orbit="auto 85deg 140%"
+            class="z-10 cursor-grab active:cursor-grabbing"
+          >
+            <!-- Custom Loading Slot -->
+            <div slot="poster" class="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-black/30 backdrop-blur-sm rounded-full">
+              <div class="w-12 h-12 border-4 border-brand-orange border-t-transparent rounded-full animate-spin mb-3"></div>
+              <p class="text-xs font-bold text-white tracking-wide">Memuat Model 3D Dimsum...</p>
+              <p class="text-[10px] text-white/70">Tekstur PBR Ultra Crisp</p>
+            </div>
+
+            <!-- AR Button (Khusus HP yang support WebXR / QuickLook) -->
+            <button slot="ar-button" class="absolute top-2 right-2 bg-black/60 hover:bg-black/90 text-white text-[11px] font-bold px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-md flex items-center gap-1.5 shadow-lg active:scale-95 transition">
+              <span>📱</span>
+              <span>Lihat di Meja (AR)</span>
+            </button>
+          </model-viewer>
+        </div>
+
+        <!-- Floating Hint: Putar 360 -->
+        <div class="absolute bottom-2 inset-x-0 flex justify-center pointer-events-none z-20">
+          <div class="bg-black/80 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-[11px] font-bold text-white flex items-center gap-2 shadow-xl animate-float-slow">
+            <span class="text-sm">👆</span>
+            <span>Geser piring untuk putar 360°</span>
+          </div>
+        </div>
+
+        <!-- Tombol Kontrol Cepat 3D -->
+        <div class="absolute right-2 bottom-3 flex flex-col gap-1.5 z-20">
+          <button id="toggleRotateBtn" title="Putar Otomatis" class="w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white text-xs flex items-center justify-center border border-white/20 shadow backdrop-blur transition active:scale-90">
+            🔄
+          </button>
+          <button id="resetCamBtn" title="Reset Sudut Pandang" class="w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white text-xs flex items-center justify-center border border-white/20 shadow backdrop-blur transition active:scale-90">
+            🎯
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== BADGE HARGA & PROMO (Persis Gambar) ==================== -->
+      <div class="relative z-20 mt-1 mb-6 px-2">
+        <div class="bg-gradient-to-r from-amber-400 via-brand-yellow to-amber-500 text-brand-dark p-4 rounded-2xl shadow-2xl border-2 border-white/80 flex items-center justify-between">
+          <div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="font-title font-black text-3xl md:text-4xl text-neutral-950 tracking-tight">Rp 20k</span>
+              <span class="font-title font-extrabold text-xl text-neutral-900 uppercase">ISI 5</span>
+            </div>
+            <p class="text-[11px] font-bold text-neutral-800 mt-0.5 flex items-center gap-1">
+              <span>🧀</span>
+              <span>Keju Mozzarella Molor + Saus Cocol</span>
+            </p>
+          </div>
+
+          <!-- Stiker Dompet Imut Seperti Poster -->
+          <div class="relative w-14 h-14 bg-pink-300 border-2 border-neutral-900 rounded-2xl p-1 flex flex-col items-center justify-center shadow-lg -rotate-6 transform hover:rotate-0 transition">
+            <div class="flex gap-1 text-[10px] font-black text-yellow-900">
+              <span>🪙</span><span>🪙</span>
+            </div>
+            <div class="text-sm mt-0.5">👛✨</div>
+            <span class="text-[8px] font-black tracking-tighter text-neutral-900 uppercase">Hemat!</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== FORM PEMESANAN & HITUNG TOTAL ==================== -->
+      <div id="pesan" class="bg-brand-card/95 backdrop-blur-xl border border-white/10 rounded-3xl p-5 text-left shadow-2xl space-y-4">
+        
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div>
+            <h3 class="font-title font-bold text-lg text-white">Form Pesan Cepat</h3>
+            <p class="text-xs text-neutral-400">Langsung terhubung ke WhatsApp penjual</p>
+          </div>
+          <span class="px-2.5 py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold rounded-full">
+            ● Ready Siap Goreng
+          </span>
+        </div>
+
+        <!-- Selector Jumlah Porsi -->
+        <div class="bg-black/40 border border-white/10 p-3.5 rounded-2xl flex items-center justify-between">
+          <div>
+            <span class="text-xs font-semibold text-neutral-300 block">Jumlah Pesanan:</span>
+            <span id="pcsInfo" class="text-[11px] text-brand-yellow font-bold">5 Pcs Dimsum Goreng</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="btnMinus" type="button" class="w-9 h-9 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-black text-lg flex items-center justify-center transition active:scale-90 border border-white/10">
+              -
+            </button>
+            <span id="qtyDisplay" class="font-title font-black text-2xl text-white w-8 text-center">1</span>
+            <button id="btnPlus" type="button" class="w-9 h-9 rounded-xl bg-brand-orange hover:bg-brand-deepOrange text-white font-black text-lg flex items-center justify-center transition active:scale-90 shadow-lg shadow-brand-orange/30">
+              +
+            </button>
+          </div>
+        </div>
+
+        <!-- Pilihan Saus / Sambal -->
+        <div>
+          <label class="text-xs font-semibold text-neutral-300 mb-1.5 block">Pilihan Saus Cocol:</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-black/30 border border-white/10 cursor-pointer hover:border-brand-orange transition">
+              <input type="radio" name="saus" value="Saus Bangkok Gurih Pedas" checked class="accent-brand-orange" />
+              <span class="font-medium text-neutral-200">🌶️ Saus Bangkok</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-black/30 border border-white/10 cursor-pointer hover:border-brand-orange transition">
+              <input type="radio" name="saus" value="Mayonaise Keju Creamy" class="accent-brand-orange" />
+              <span class="font-medium text-neutral-200">🧀 Mayo Creamy</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Catatan Khusus -->
+        <div>
+          <label class="text-xs font-semibold text-neutral-300 mb-1.5 block">Catatan Tambahan (Opsional):</label>
+          <input 
+            type="text" 
+            id="catatanInput" 
+            placeholder="Contoh: Goreng agak kering ya kak, saus banyakin" 
+            class="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-brand-orange transition"
+          />
+        </div>
+
+        <!-- Ringkasan Total Harga -->
+        <div class="p-3.5 bg-gradient-to-r from-orange-950/40 to-neutral-900 border border-brand-orange/30 rounded-2xl flex items-center justify-between">
+          <div>
+            <span class="text-[11px] text-neutral-400 block font-medium">Total Pembayaran:</span>
+            <span id="totalDisplay" class="font-title font-black text-2xl text-brand-yellow">Rp 20.000</span>
+          </div>
+          <span class="text-[10px] text-neutral-400 bg-white/5 px-2.5 py-1 rounded-md border border-white/10">
+            Belum termasuk ongkir
+          </span>
+        </div>
+
+        <!-- Tombol Utama Pesan Sekarang (WhatsApp) Sesuai Poster -->
+        <button 
+          id="btnOrderWA" 
+          type="button" 
+          class="w-full py-4 bg-gradient-to-r from-brand-orange via-orange-500 to-amber-500 hover:from-brand-deepOrange hover:to-orange-600 text-white font-title font-extrabold text-base md:text-lg rounded-2xl shadow-xl shadow-brand-orange/40 flex items-center justify-center gap-2.5 active:scale-[0.98] transition border-t border-white/20 uppercase tracking-wide"
+        >
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.074-2.115-.515-1.748-.724-2.883-2.493-2.97-2.608-.088-.116-.708-.941-.708-1.792s.448-1.27.607-1.442c.16-.172.348-.215.465-.215.116 0 .232.001.332.006.107.006.25.04.39.377.144.348.492 1.2.535 1.288.043.088.072.19.014.305-.058.116-.088.19-.174.29-.088.102-.186.226-.265.304-.088.087-.179.182-.077.357.102.175.452.744.97 1.206.666.594 1.228.777 1.402.864.175.088.277.073.38-.044.102-.116.436-.508.552-.682.117-.174.233-.145.394-.087.16.058 1.017.48 1.192.567.175.087.292.13.335.203.044.072.044.42-.1.825z"/></svg>
+          <span>PESAN SEKARANG!</span>
+        </button>
+
+        <p class="text-center text-[11px] text-neutral-400 font-medium">
+          Official Contact: <span class="text-brand-yellow font-bold">0896-6970-0178</span>
+        </p>
+      </div>
+
+      <!-- ==================== 4 PILAR KENIKMATAN ==================== -->
+      <div class="mt-8 grid grid-cols-2 gap-3 text-left">
+        <div class="bg-neutral-900/80 border border-white/10 p-3.5 rounded-2xl">
+          <div class="text-2xl mb-1">🧀</div>
+          <h4 class="font-title font-bold text-sm text-white">Mozzarella Molor</h4>
+          <p class="text-[11px] text-neutral-400 mt-0.5">Keju asli melimpah, ditarik molor panjang bikin puas.</p>
+        </div>
+        <div class="bg-neutral-900/80 border border-white/10 p-3.5 rounded-2xl">
+          <div class="text-2xl mb-1">🥟</div>
+          <h4 class="font-title font-bold text-sm text-white">Kulit Super Crispy</h4>
+          <p class="text-[11px] text-neutral-400 mt-0.5">Digoreng garing renyah keemasan, krenyes di tiap gigitan.</p>
+        </div>
+        <div class="bg-neutral-900/80 border border-white/10 p-3.5 rounded-2xl">
+          <div class="text-2xl mb-1">🌶️</div>
+          <h4 class="font-title font-bold text-sm text-white">Saus Cocol Juara</h4>
+          <p class="text-[11px] text-neutral-400 mt-0.5">Racikan bumbu saus spesial manis, asam, gurih, dan pedas.</p>
+        </div>
+        <div class="bg-neutral-900/80 border border-white/10 p-3.5 rounded-2xl">
+          <div class="text-2xl mb-1">⚡</div>
+          <h4 class="font-title font-bold text-sm text-white">Goreng Dadakan</h4>
+          <p class="text-[11px] text-neutral-400 mt-0.5">Freshly fried saat ada pesanan, sampai di tangan tetap hangat.</p>
+        </div>
+      </div>
+
+      <!-- ==================== CARA SIMPAN & HANGATKAN ==================== -->
+      <div class="mt-4 bg-black/40 border border-white/10 p-4 rounded-2xl text-left text-xs space-y-1.5">
+        <div class="flex items-center gap-2 text-brand-yellow font-bold text-xs">
+          <span>💡</span>
+          <span>Tips Makan Terbaik:</span>
+        </div>
+        <p class="text-neutral-300 text-[11px] leading-relaxed">
+          Paling nikmat dimakan selagi hangat agar kejunya molor maksimal. Kalau sudah dingin, cukup panaskan di teflon tanpa minyak selama 2 menit atau air fryer 160°C selama 3 menit!
+        </p>
+      </div>
+
+      <!-- ==================== FOOTER ==================== -->
+      <footer class="mt-8 pt-6 border-t border-white/10 text-center text-[11px] text-neutral-500 space-y-1">
+        <p class="font-semibold text-neutral-400">© 2026 Dimsum Goreng Keju Lumer. All rights reserved.</p>
+        <p>Bisa pesan via GoSend, GrabExpress, & ShopeeXpress Instant.</p>
+      </footer>
+
+    </section>
+  </main>
+
+  <!-- ==================== STICKY FLOATING BOTTOM BAR (MOBILE) ==================== -->
+  <aside class="fixed bottom-0 inset-x-0 z-40 bg-black/90 backdrop-blur-lg border-t border-white/15 p-3 md:hidden">
+    <div class="max-w-md mx-auto flex items-center justify-between gap-3">
+      <div>
+        <span class="text-[10px] text-neutral-400 block font-medium">Dimsum Keju (Isi 5)</span>
+        <span id="stickyTotalDisplay" class="font-title font-black text-lg text-brand-yellow">Rp 20.000</span>
+      </div>
+      <button 
+        id="stickyBtnOrder" 
+        type="button" 
+        class="flex-1 py-3 px-4 bg-brand-orange hover:bg-brand-deepOrange text-white font-title font-bold text-sm rounded-xl shadow-lg shadow-brand-orange/30 flex items-center justify-center gap-2 active:scale-95 transition"
+      >
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.074-2.115-.515-1.748-.724-2.883-2.493-2.97-2.608-.088-.116-.708-.941-.708-1.792s.448-1.27.607-1.442c.16-.172.348-.215.465-.215.116 0 .232.001.332.006.107.006.25.04.39.377.144.348.492 1.2.535 1.288.043.088.072.19.014.305-.058.116-.088.19-.174.29-.088.102-.186.226-.265.304-.088.087-.179.182-.077.357.102.175.452.744.97 1.206.666.594 1.228.777 1.402.864.175.088.277.073.38-.044.102-.116.436-.508.552-.682.117-.174.233-.145.394-.087.16.058 1.017.48 1.192.567.175.087.292.13.335.203.044.072.044.42-.1.825z"/></svg>
+        <span>Pesan via WA</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ==================== CLIENT INTERACTION JAVASCRIPT ==================== -->
+  <script>
+    const PRICE_PER_PORTION = 20000;
+    const WHATSAPP_PHONE = "6289669700178"; // 089669700178
+
+    let qty = 1;
+
+    const qtyDisplay = document.getElementById("qtyDisplay");
+    const pcsInfo = document.getElementById("pcsInfo");
+    const totalDisplay = document.getElementById("totalDisplay");
+    const stickyTotalDisplay = document.getElementById("stickyTotalDisplay");
+    const btnMinus = document.getElementById("btnMinus");
+    const btnPlus = document.getElementById("btnPlus");
+    const btnOrderWA = document.getElementById("btnOrderWA");
+    const stickyBtnOrder = document.getElementById("stickyBtnOrder");
+    const catatanInput = document.getElementById("catatanInput");
+
+    const viewer = document.getElementById("dimsumViewer");
+    const toggleRotateBtn = document.getElementById("toggleRotateBtn");
+    const resetCamBtn = document.getElementById("resetCamBtn");
+
+    function updatePrice() {
+      const total = qty * PRICE_PER_PORTION;
+      const formatted = "Rp " + total.toLocaleString("id-ID");
+      qtyDisplay.textContent = qty;
+      pcsInfo.textContent = (qty * 5) + " Pcs Dimsum Goreng";
+      totalDisplay.textContent = formatted;
+      stickyTotalDisplay.textContent = formatted;
+    }
+
+    btnMinus.addEventListener("click", () => {
+      if (qty > 1) {
+        qty--;
+        updatePrice();
+      }
+    });
+
+    btnPlus.addEventListener("click", () => {
+      qty++;
+      updatePrice();
+    });
+
+    function getSelectedSaus() {
+      const checked = document.querySelector('input[name="saus"]:checked');
+      return checked ? checked.value : "Saus Bangkok Gurih Pedas";
+    }
+
+    function sendWhatsAppOrder() {
+      const total = qty * PRICE_PER_PORTION;
+      const saus = getSelectedSaus();
+      const catatan = catatanInput.value.trim() || "-";
+
+      const message = 
+`Halo Kak! Saya mau pesan Dimsum Goreng Keju Lumer 🥟🧀
+
+Detail Pesanan:
+• Menu: Dimsum Goreng Keju Lumer (Isi 5 pcs)
+• Jumlah: ${qty} Porsi (${qty * 5} pcs)
+• Pilihan Saus: ${saus}
+• Catatan: ${catatan}
+• Total Harga: Rp ${total.toLocaleString("id-ID")}
+
+Mohon info ongkir dan nomor rekening/e-wallet untuk pembayarannya ya kak, terima kasih! 🙏`;
+
+      // Trigger party confetti!
+      confetti({
+        particleCount: 60,
+        spread: 70,
+        origin: { y: 0.8 },
+        colors: ['#ff5400', '#ffb703', '#ffffff']
+      });
+
+      const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+      setTimeout(() => {
+        window.open(waUrl, "_blank");
+      }, 350);
+    }
+
+    btnOrderWA.addEventListener("click", sendWhatsAppOrder);
+    stickyBtnOrder.addEventListener("click", sendWhatsAppOrder);
+
+    // 3D Controls
+    let isRotating = true;
+    toggleRotateBtn.addEventListener("click", () => {
+      isRotating = !isRotating;
+      if (isRotating) {
+        viewer.setAttribute("auto-rotate", "");
+        toggleRotateBtn.classList.remove("opacity-50");
+      } else {
+        viewer.removeAttribute("auto-rotate");
+        toggleRotateBtn.classList.add("opacity-50");
+      }
+    });
+
+    resetCamBtn.addEventListener("click", () => {
+      viewer.cameraOrbit = "0deg 55deg 105%";
+      viewer.fieldOfView = "auto";
+    });
+  </script>
+</body>
+</html>
