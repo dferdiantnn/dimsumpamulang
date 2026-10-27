@@ -9,7 +9,7 @@ Landing page interaktif 3D untuk bisnis **Dimsum Goreng Keju Lumer** milik Putra
 
 ## 📁 Struktur File
 - `index.html`: Landing page utama dengan visual poster, 3D interactive model viewer, font Tomavoo Maknu, dan form checkout WhatsApp.
-- `dimsum-3d.glb`: Model 3D piring dimsum keju lumer teroptimasi (3.4 MB, 67 MB VRAM).
+- `dimsum-3d.glb`: Model 3D piring dimsum keju lumer teroptimasi (1.6 MB, 16 MB VRAM).
 - `fonts/TomavooMaknu.otf` & `.ttf`: Font display resmi sesuai flyer/poster.
 - `public/dimsum-3d.glb`: Backup asset 3D untuk deployment.
 

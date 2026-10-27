@@ -53,6 +53,10 @@
     }
   </script>
 
+  <!-- Preload 3D Asset & Meshopt Decoder agar muncul instan di HP -->
+  <link rel="preload" href="./dimsum-3d.glb" as="fetch" crossorigin>
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/meshoptimizer@0.20.0/meshopt_decoder.js" as="script">
+
   <!-- Google Model Viewer (3D Web Component) + Meshopt Decoder untuk EXT_meshopt_compression -->
   <script>
     self.ModelViewerElement = self.ModelViewerElement || {};
@@ -60,8 +64,8 @@
   </script>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-  <!-- Canvas Confetti for Celebration -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+  <!-- Canvas Confetti for Celebration (defer agar tidak menghambat render 3D) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
 
   <style>
     /* Custom Font: Tomavoo Maknu Chunky Bold (hanya A-Z & a-z agar angka/simbol tidak bug jadi watermark 'pdt') */
@@ -183,11 +187,11 @@
           <!-- Subtle Glow Halo di Belakang 3D -->
           <div id="glowHalo3D" class="absolute inset-4 rounded-full bg-gradient-to-t from-brand-yellow/30 to-brand-orange/40 blur-2xl animate-pulse-glow -z-0 transition-opacity duration-200"></div>
 
-          <!-- Wrapper Pop-Out: tepat di tengah, saat zoom in membesar dari tengah & menimpa semua teks -->
+          <!-- Wrapper Pop-Out: tepat di tengah, tanpa filter CSS berat agar GPU HP ringan & tidak hilang saat max zoom -->
           <div
             id="viewerPopoutWrap"
-            class="relative w-full h-full z-30 origin-center will-change-transform transition-transform duration-75 ease-out"
-            style="transform: scale(1); filter: drop-shadow(0 22px 36px rgba(0,0,0,0.75));"
+            class="relative w-full h-full z-30 origin-center transition-transform duration-75 ease-out"
+            style="transform: scale(1);"
           >
             <model-viewer
               id="dimsumViewer"
@@ -504,14 +508,18 @@ Mohon infonya ya kak, terima kasih! 🙏`;
       }
     });
 
-    // Pastikan internal canvas <model-viewer> selalu sinkron 100% dengan ukuran asli container walau sedang di-scale CSS
+    // Pastikan internal canvas <model-viewer> selalu sinkron & tetap terdeteksi di dalam layar walau di-zoom maksimal
     const origGetRect = viewer.getBoundingClientRect.bind(viewer);
     viewer.getBoundingClientRect = function () {
       const r = origGetRect();
       const w = this.clientWidth || r.width;
       const h = this.clientHeight || r.height;
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const left = cx - w / 2;
+      const top = cy - h / 2;
       return {
-        x: r.x, y: r.y, top: r.top, left: r.left, right: r.left + w, bottom: r.top + h,
+        x: left, y: top, top, left, right: left + w, bottom: top + h,
         width: w, height: h,
         toJSON() { return this; }
       };
@@ -520,11 +528,7 @@ Mohon infonya ya kak, terima kasih! 🙏`;
     function applyZoom(newZoom) {
       currentZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
       const scaleVal = BASE_SCALE * currentZoom;
-      const shadowBlur = Math.round(36 + (currentZoom - 1) * 24);
-      const shadowAlpha = Math.min(0.95, 0.75 + (currentZoom - 1) * 0.08).toFixed(2);
-
       popoutWrap.style.transform = `scale(${scaleVal})`;
-      popoutWrap.style.filter = `drop-shadow(0 26px ${shadowBlur}px rgba(0,0,0,${shadowAlpha}))`;
 
       const isZoomed = currentZoom > 1.02;
       if (isZoomed) {
