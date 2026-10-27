@@ -31,6 +31,7 @@
           },
           fontFamily: {
             title: ['TomavooMaknu', 'Fredoka', 'sans-serif'],
+            price: ['Fredoka', '"Plus Jakarta Sans"', 'sans-serif'],
             sans: ['"Plus Jakarta Sans"', 'sans-serif'],
           },
           animation: {
@@ -52,14 +53,18 @@
     }
   </script>
 
-  <!-- Google Model Viewer (3D Web Component) -->
+  <!-- Google Model Viewer (3D Web Component) + Meshopt Decoder untuk EXT_meshopt_compression -->
+  <script>
+    self.ModelViewerElement = self.ModelViewerElement || {};
+    self.ModelViewerElement.meshoptDecoderLocation = 'https://cdn.jsdelivr.net/npm/meshoptimizer@0.20.0/meshopt_decoder.js';
+  </script>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
   <!-- Canvas Confetti for Celebration -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
 
   <style>
-    /* Custom Font: Tomavoo Maknu Chunky Bold */
+    /* Custom Font: Tomavoo Maknu Chunky Bold (hanya A-Z & a-z agar angka/simbol tidak bug jadi watermark 'pdt') */
     @font-face {
       font-family: 'TomavooMaknu';
       src: url('./fonts/TomavooMaknu.otf') format('opentype'),
@@ -67,9 +72,10 @@
       font-weight: normal;
       font-style: normal;
       font-display: swap;
+      unicode-range: U+0041-005A, U+0061-007A, U+0020;
     }
 
-    /* Styling khusus Model Viewer agar menyatu dengan poster */
+    /* Styling khusus Model Viewer agar menyatu dengan poster & bebas keluar layar saat di-zoom */
     model-viewer {
       width: 100%;
       height: 100%;
@@ -77,6 +83,9 @@
       outline: none;
       --progress-bar-color: #ff5400;
       --progress-mask: transparent;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     model-viewer:focus {
@@ -103,7 +112,7 @@
   </style>
 </head>
 
-<body class="bg-brand-dark text-white font-sans antialiased selection:bg-brand-orange selection:text-white pb-28 md:pb-16">
+<body class="bg-brand-dark text-white font-sans antialiased selection:bg-brand-orange selection:text-white pb-28 md:pb-16 overflow-x-hidden">
 
   <!-- ==================== HEADER BAR ==================== -->
   <header class="fixed top-0 inset-x-0 z-50 bg-black/60 backdrop-blur-md border-b border-white/10">
@@ -123,7 +132,7 @@
   </header>
 
   <!-- ==================== MAIN POSTER CONTAINER ==================== -->
-  <main class="max-w-md mx-auto pt-14 min-h-screen relative overflow-hidden bg-brand-dark">
+  <main class="max-w-md mx-auto pt-14 min-h-screen relative bg-brand-dark">
 
     <!-- HERO POSTER SECTION (Sesuai Desain Poster Asli) -->
     <section class="relative pt-6 pb-8 px-4 text-center">
@@ -165,75 +174,87 @@
         "Sensasi renyah di luar, keju mozzarella molor meleleh di dalam!"
       </p>
 
-      <!-- ==================== 3D INTERACTIVE VIEWER STAGE ==================== -->
-      <div class="relative my-4 flex justify-center items-center">
+      <!-- ==================== 3D INTERACTIVE VIEWER STAGE (POP-OUT LAYER PALING DEPAN) ==================== -->
+      <div id="stage3D" class="relative my-4 flex justify-center items-center z-30">
         
-        <!-- Piring 3D Interaktif Container -->
+        <!-- Slot ukuran normal 340px agar layout poster tetap rapi, tapi mengizinkan 3D keluar batas -->
         <div class="relative w-[340px] h-[340px] sm:w-[380px] sm:h-[380px] mx-auto rounded-full flex items-center justify-center">
           
           <!-- Subtle Glow Halo di Belakang 3D -->
-          <div class="absolute inset-4 rounded-full bg-gradient-to-t from-brand-yellow/30 to-brand-orange/40 blur-2xl animate-pulse-glow -z-0"></div>
+          <div id="glowHalo3D" class="absolute inset-4 rounded-full bg-gradient-to-t from-brand-yellow/30 to-brand-orange/40 blur-2xl animate-pulse-glow -z-0 transition-opacity duration-200"></div>
 
-          <!-- Web Component Model Viewer (Optimized 3.4MB - Super Fast) -->
-          <model-viewer
-            id="dimsumViewer"
-            src="./dimsum-3d.glb"
-            alt="3D Dimsum Goreng Keju Lumer"
-            loading="eager"
-            reveal="auto"
-            camera-controls
-            auto-rotate
-            rotation-per-second="25deg"
-            auto-rotate-delay="500"
-            shadow-intensity="1.5"
-            shadow-softness="0.8"
-            exposure="1.15"
-            interaction-prompt="none"
-            camera-orbit="0deg 55deg 105%"
-            min-camera-orbit="auto auto 70%"
-            max-camera-orbit="auto 85deg 140%"
-            class="z-10 cursor-grab active:cursor-grabbing"
+          <!-- Wrapper Pop-Out: tepat di tengah, saat zoom in membesar dari tengah & menimpa semua teks -->
+          <div
+            id="viewerPopoutWrap"
+            class="relative w-full h-full z-30 origin-center will-change-transform transition-transform duration-75 ease-out"
+            style="transform: scale(1); filter: drop-shadow(0 22px 36px rgba(0,0,0,0.75));"
           >
-            <!-- Minimalist Fast Spinner -->
-            <div slot="poster" class="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-black/20 backdrop-blur-sm rounded-full">
-              <div class="w-10 h-10 border-3 border-brand-orange border-t-transparent rounded-full animate-spin mb-2"></div>
-              <p class="text-xs font-bold text-white tracking-wide">Memuat 3D...</p>
-            </div>
-
-            <!-- AR Button (Khusus HP yang support WebXR / QuickLook) -->
-            <button slot="ar-button" class="absolute top-2 right-2 bg-black/60 hover:bg-black/90 text-white text-[11px] font-bold px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-md flex items-center gap-1.5 shadow-lg active:scale-95 transition">
-              <span>📱</span>
-              <span>Lihat AR</span>
-            </button>
-          </model-viewer>
+            <model-viewer
+              id="dimsumViewer"
+              src="./dimsum-3d.glb"
+              alt="3D Dimsum Goreng Keju Lumer"
+              loading="eager"
+              reveal="auto"
+              camera-controls
+              disable-zoom
+              disable-pan
+              auto-rotate
+              rotation-per-second="25deg"
+              auto-rotate-delay="500"
+              shadow-intensity="1.5"
+              shadow-softness="0.8"
+              exposure="1.15"
+              interaction-prompt="none"
+              camera-orbit="0deg 55deg 110%"
+              min-camera-orbit="auto 15deg 110%"
+              max-camera-orbit="auto 85deg 110%"
+              class="cursor-grab active:cursor-grabbing"
+            >
+              <!-- Minimalist Fast Spinner -->
+              <div slot="poster" class="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-black/20 backdrop-blur-sm rounded-full">
+                <div class="w-14 h-14 border-4 border-brand-orange border-t-transparent rounded-full animate-spin mb-3"></div>
+                <p class="text-base font-bold text-white tracking-wide">Memuat 3D...</p>
+              </div>
+            </model-viewer>
+          </div>
         </div>
 
         <!-- Floating Hint: Putar 360 -->
-        <div class="absolute bottom-2 inset-x-0 flex justify-center pointer-events-none z-20">
+        <div id="hint3D" class="absolute bottom-2 inset-x-0 flex justify-center pointer-events-none z-40 transition-opacity duration-200">
           <div class="bg-black/80 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-[11px] font-bold text-white flex items-center gap-2 shadow-xl animate-float-slow">
             <span class="text-sm">👆</span>
-            <span>Geser piring untuk putar 360°</span>
+            <span>Geser putar 360° • Scroll/Cubit Zoom Pop-Out</span>
           </div>
         </div>
 
         <!-- Tombol Kontrol Cepat 3D -->
-        <div class="absolute right-2 bottom-3 flex flex-col gap-1.5 z-20">
-          <button id="toggleRotateBtn" title="Putar Otomatis" class="w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white text-xs flex items-center justify-center border border-white/20 shadow backdrop-blur transition active:scale-90">
-            🔄
+        <div id="controls3D" class="absolute right-2 bottom-3 flex flex-col gap-1.5 z-40 transition-opacity duration-200">
+          <button id="toggleRotateBtn" type="button" title="Putar Otomatis" class="w-8 h-8 rounded-full bg-black/75 hover:bg-black text-white text-xs flex items-center justify-center border border-white/25 shadow backdrop-blur transition active:scale-90">
+            <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           </button>
-          <button id="resetCamBtn" title="Reset Sudut Pandang" class="w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white text-xs flex items-center justify-center border border-white/20 shadow backdrop-blur transition active:scale-90">
-            🎯
+          <button id="resetCamBtn" type="button" title="Reset Sudut Pandang & Zoom" class="w-8 h-8 rounded-full bg-black/75 hover:bg-black text-white text-xs flex items-center justify-center border border-white/25 shadow backdrop-blur transition active:scale-90">
+            <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
           </button>
         </div>
       </div>
 
+      <!-- Tombol Indikator & Reset Saat 3D Sedang Zoom Pop-Out -->
+      <button
+        id="zoomStatusPill"
+        type="button"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] hidden items-center gap-2 px-4 py-2 rounded-full bg-black/85 text-white text-xs font-bold border border-brand-orange/60 shadow-2xl backdrop-blur-md active:scale-95 transition"
+      >
+        <span id="zoomPercentText" class="text-brand-yellow">Zoom 150%</span>
+        <span>• Scroll Bawah / Klik untuk Zoom Out</span>
+      </button>
+
       <!-- ==================== BADGE HARGA & PROMO (Persis Gambar) ==================== -->
       <div class="relative z-20 mt-1 mb-6 px-2">
-        <div class="bg-gradient-to-r from-amber-400 via-brand-yellow to-amber-500 text-brand-dark p-4 rounded-2xl shadow-2xl border-2 border-white/80 flex items-center justify-between">
-          <div>
-            <div class="flex items-baseline gap-1.5">
-              <span class="font-title font-black text-3xl md:text-4xl text-neutral-950 tracking-tight">Rp 20k</span>
-              <span class="font-title font-extrabold text-xl text-neutral-900 uppercase">ISI 5</span>
+        <div class="bg-gradient-to-r from-amber-400 via-brand-yellow to-amber-500 text-brand-dark p-4 rounded-2xl shadow-2xl border-2 border-white/80 flex items-center justify-between gap-2">
+          <div class="text-left">
+            <div class="flex items-baseline gap-2">
+              <span class="font-price font-bold text-3xl md:text-4xl text-neutral-950 tracking-tight leading-none">Rp 20k</span>
+              <span class="font-price font-bold text-xl text-neutral-900 uppercase leading-none">ISI 5</span>
             </div>
             <p class="text-[11px] font-bold text-neutral-800 mt-0.5 flex items-center gap-1">
               <span>🧀</span>
@@ -242,12 +263,12 @@
           </div>
 
           <!-- Stiker Dompet Imut Seperti Poster -->
-          <div class="relative w-14 h-14 bg-pink-300 border-2 border-neutral-900 rounded-2xl p-1 flex flex-col items-center justify-center shadow-lg -rotate-6 transform hover:rotate-0 transition">
-            <div class="flex gap-1 text-[10px] font-black text-yellow-900">
+          <div class="shrink-0 relative w-16 h-16 bg-pink-300 border-2 border-neutral-900 rounded-2xl px-1.5 py-1 flex flex-col items-center justify-between shadow-lg -rotate-6 transform hover:rotate-0 transition">
+            <div class="flex gap-0.5 text-[10px] leading-none">
               <span>🪙</span><span>🪙</span>
             </div>
-            <div class="text-sm mt-0.5">👛✨</div>
-            <span class="text-[8px] font-black tracking-tighter text-neutral-900 uppercase">Hemat!</span>
+            <div class="text-sm leading-none">👛✨</div>
+            <span class="text-[9px] font-extrabold leading-none tracking-tight text-neutral-900 uppercase">HEMAT!</span>
           </div>
         </div>
       </div>
@@ -255,12 +276,12 @@
       <!-- ==================== FORM PEMESANAN (Hanya Porsi & Catatan) ==================== -->
       <div id="pesan" class="bg-brand-card/95 backdrop-blur-xl border border-white/10 rounded-3xl p-5 text-left shadow-2xl space-y-4">
         
-        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
           <div>
             <h3 class="font-title font-bold text-lg text-white">Form Pesan Cepat</h3>
             <p class="text-xs text-neutral-400">Langsung terhubung ke WhatsApp penjual</p>
           </div>
-          <span class="px-2.5 py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold rounded-full">
+          <span class="shrink-0 whitespace-nowrap px-2.5 py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold rounded-full">
             ● Ready Siap Goreng
           </span>
         </div>
@@ -275,7 +296,7 @@
             <button id="btnMinus" type="button" class="w-9 h-9 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-black text-lg flex items-center justify-center transition active:scale-90 border border-white/10">
               -
             </button>
-            <span id="qtyDisplay" class="font-title font-black text-2xl text-white w-8 text-center">1</span>
+            <span id="qtyDisplay" class="font-price font-bold text-2xl text-white w-8 text-center">1</span>
             <button id="btnPlus" type="button" class="w-9 h-9 rounded-xl bg-brand-orange hover:bg-brand-deepOrange text-white font-black text-lg flex items-center justify-center transition active:scale-90 shadow-lg shadow-brand-orange/30">
               +
             </button>
@@ -297,7 +318,7 @@
         <div class="p-3.5 bg-gradient-to-r from-orange-950/40 to-neutral-900 border border-brand-orange/30 rounded-2xl flex items-center justify-between">
           <div>
             <span class="text-[11px] text-neutral-400 block font-medium">Total Harga:</span>
-            <span id="totalDisplay" class="font-title font-black text-2xl text-brand-yellow">Rp 20.000</span>
+            <span id="totalDisplay" class="font-price font-bold text-2xl text-brand-yellow">Rp 20.000</span>
           </div>
         </div>
 
@@ -308,7 +329,7 @@
           class="w-full py-4 bg-gradient-to-r from-brand-orange via-orange-500 to-amber-500 hover:from-brand-deepOrange hover:to-orange-600 text-white font-title font-extrabold text-base md:text-lg rounded-2xl shadow-xl shadow-brand-orange/40 flex items-center justify-center gap-2.5 active:scale-[0.98] transition border-t border-white/20 uppercase tracking-wide"
         >
           <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.074-2.115-.515-1.748-.724-2.883-2.493-2.97-2.608-.088-.116-.708-.941-.708-1.792s.448-1.27.607-1.442c.16-.172.348-.215.465-.215.116 0 .232.001.332.006.107.006.25.04.39.377.144.348.492 1.2.535 1.288.043.088.072.19.014.305-.058.116-.088.19-.174.29-.088.102-.186.226-.265.304-.088.087-.179.182-.077.357.102.175.452.744.97 1.206.666.594 1.228.777 1.402.864.175.088.277.073.38-.044.102-.116.436-.508.552-.682.117-.174.233-.145.394-.087.16.058 1.017.48 1.192.567.175.087.292.13.335.203.044.072.044.42-.1.825z"/></svg>
-          <span>PESAN SEKARANG!</span>
+          <span>PESAN SEKARANG</span>
         </button>
 
         <p class="text-center text-[11px] text-neutral-400 font-medium">
@@ -329,7 +350,7 @@
     <div class="max-w-md mx-auto flex items-center justify-between gap-3">
       <div>
         <span class="text-[10px] text-neutral-400 block font-medium">Dimsum Keju (Isi 5)</span>
-        <span id="stickyTotalDisplay" class="font-title font-black text-lg text-brand-yellow">Rp 20.000</span>
+        <span id="stickyTotalDisplay" class="font-price font-bold text-lg text-brand-yellow">Rp 20.000</span>
       </div>
       <button 
         id="stickyBtnOrder" 
@@ -416,6 +437,140 @@ Mohon infonya ya kak, terima kasih! 🙏`;
     btnOrderWA.addEventListener("click", sendWhatsAppOrder);
     stickyBtnOrder.addEventListener("click", sendWhatsAppOrder);
 
+    // ==================== 3D POP-OUT ZOOM & ANTI-SCROLL CONTROL ====================
+    const stage3D = document.getElementById("stage3D");
+    const popoutWrap = document.getElementById("viewerPopoutWrap");
+    const hint3D = document.getElementById("hint3D");
+    const controls3D = document.getElementById("controls3D");
+    const zoomStatusPill = document.getElementById("zoomStatusPill");
+    const zoomPercentText = document.getElementById("zoomPercentText");
+
+    const BASE_SCALE = 1.0; // Ukuran normal 100% tepat di tengah container 340px
+    const MIN_ZOOM = 1.0;
+    const MAX_ZOOM = 3.8;   // Saat zoom maksimal ~1292px (menutupi seluruh layar & teks)
+
+    let currentZoom = 1.0;
+    let zoomCooldownUntil = 0;
+    let isPointerOn3D = false;
+
+    // Pastikan internal canvas <model-viewer> selalu sinkron 100% dengan ukuran asli container walau sedang di-scale CSS
+    const origGetRect = viewer.getBoundingClientRect.bind(viewer);
+    viewer.getBoundingClientRect = function () {
+      const r = origGetRect();
+      const w = this.clientWidth || r.width;
+      const h = this.clientHeight || r.height;
+      return {
+        x: r.x, y: r.y, top: r.top, left: r.left, right: r.left + w, bottom: r.top + h,
+        width: w, height: h,
+        toJSON() { return this; }
+      };
+    };
+
+    function applyZoom(newZoom) {
+      currentZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
+      const scaleVal = BASE_SCALE * currentZoom;
+      const shadowBlur = Math.round(36 + (currentZoom - 1) * 24);
+      const shadowAlpha = Math.min(0.95, 0.75 + (currentZoom - 1) * 0.08).toFixed(2);
+
+      popoutWrap.style.transform = `scale(${scaleVal})`;
+      popoutWrap.style.filter = `drop-shadow(0 26px ${shadowBlur}px rgba(0,0,0,${shadowAlpha}))`;
+
+      const isZoomed = currentZoom > 1.02;
+      if (isZoomed) {
+        // Layer paling depan di atas header (z-50), badge (z-20), form, dan bottom bar (z-40)
+        stage3D.classList.remove("z-30");
+        stage3D.classList.add("z-[100]");
+        hint3D.classList.add("opacity-0", "pointer-events-none");
+        controls3D.classList.add("opacity-0", "pointer-events-none");
+        zoomStatusPill.classList.remove("hidden");
+        zoomStatusPill.classList.add("flex");
+        zoomPercentText.textContent = `Zoom ${Math.round(currentZoom * 100)}%`;
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
+      } else {
+        stage3D.classList.remove("z-[100]");
+        stage3D.classList.add("z-30");
+        hint3D.classList.remove("opacity-0", "pointer-events-none");
+        controls3D.classList.remove("opacity-0", "pointer-events-none");
+        zoomStatusPill.classList.add("hidden");
+        zoomStatusPill.classList.remove("flex");
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+      }
+    }
+
+    stage3D.addEventListener("pointerenter", () => { isPointerOn3D = true; });
+    stage3D.addEventListener("pointerleave", () => { isPointerOn3D = false; });
+
+    // Intercept wheel/trackpad di capture phase agar zoom out mulus & tidak men-trigger scroll web
+    window.addEventListener("wheel", (e) => {
+      const now = Date.now();
+      const isZoomed = currentZoom > 1.01;
+      const inCooldown = now < zoomCooldownUntil;
+      const targetInside3D = isPointerOn3D || stage3D.contains(e.target);
+
+      // Jika sedang di-zoom, atau baru saja selesai zoom out (cooldown), atau kursor di atas 3D dan scroll ke atas/pinch
+      if (isZoomed || inCooldown || (targetInside3D && (e.deltaY < 0 || e.ctrlKey))) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const step = e.ctrlKey ? -e.deltaY * 0.018 : -e.deltaY * 0.0035;
+        applyZoom(currentZoom + step);
+
+        // Kunci scroll selama 450ms setelah menyentuh batas zoom out agar sisa inersia scroll tidak menggeser halaman
+        if (currentZoom > 1.01 || e.deltaY > 0) {
+          zoomCooldownUntil = now + 450;
+        }
+      }
+    }, { passive: false, capture: true });
+
+    // Pinch-to-Zoom 2 jari di layar sentuh (HP / Simulator)
+    let pinchStartDist = 0;
+    let pinchStartZoom = 1.0;
+
+    function getTouchDist(t1, t2) {
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
+      return Math.hypot(dx, dy);
+    }
+
+    window.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 2 && (currentZoom > 1.01 || stage3D.contains(e.target))) {
+        pinchStartDist = getTouchDist(e.touches[0], e.touches[1]);
+        pinchStartZoom = currentZoom;
+      }
+    }, { passive: false, capture: true });
+
+    window.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 2 && pinchStartDist > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        const dist = getTouchDist(e.touches[0], e.touches[1]);
+        const ratio = dist / pinchStartDist;
+        applyZoom(pinchStartZoom * ratio);
+        zoomCooldownUntil = Date.now() + 450;
+      } else if (currentZoom > 1.01 && !stage3D.contains(e.target)) {
+        // Cegah halaman ikut ter-scroll saat gambar 3D sedang di-zoom besar
+        e.preventDefault();
+      }
+    }, { passive: false, capture: true });
+
+    window.addEventListener("touchend", (e) => {
+      if (e.touches.length < 2) {
+        pinchStartDist = 0;
+      }
+    }, { capture: true });
+
+    // Double-click / Double-tap pada 3D untuk toggle Pop-Out Zoom atau Reset cepat
+    stage3D.addEventListener("dblclick", (e) => {
+      e.preventDefault();
+      applyZoom(currentZoom > 1.1 ? 1.0 : 2.4);
+    });
+
+    zoomStatusPill.addEventListener("click", () => {
+      applyZoom(1.0);
+    });
+
     // 3D Controls
     let isRotating = true;
     toggleRotateBtn.addEventListener("click", () => {
@@ -430,7 +585,8 @@ Mohon infonya ya kak, terima kasih! 🙏`;
     });
 
     resetCamBtn.addEventListener("click", () => {
-      viewer.cameraOrbit = "0deg 55deg 105%";
+      applyZoom(1.0);
+      viewer.cameraOrbit = "0deg 55deg 110%";
       viewer.fieldOfView = "auto";
     });
   </script>
