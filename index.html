@@ -178,6 +178,18 @@
         "Sensasi renyah di luar, keju mozzarella molor meleleh di dalam!"
       </p>
 
+      <!-- Tombol Lihat Pamflet -->
+      <div class="mt-3 flex justify-center">
+        <button 
+          id="btnOpenPamflet" 
+          type="button" 
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-orange-200 hover:text-white text-xs font-semibold backdrop-blur-md border border-white/15 shadow transition active:scale-95 cursor-pointer"
+        >
+          <span>📜</span>
+          <span>Lihat Pamflet Menu</span>
+        </button>
+      </div>
+
       <!-- ==================== 3D INTERACTIVE VIEWER STAGE (POP-OUT LAYER PALING DEPAN) ==================== -->
       <div id="stage3D" class="relative my-4 flex justify-center items-center z-30">
         
@@ -354,6 +366,26 @@
       </button>
     </div>
   </aside>
+
+  <!-- ==================== MODAL LIGHTBOX PAMFLET ==================== -->
+  <div id="pamfletModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/85 backdrop-blur-md p-4 transition-all duration-300 opacity-0 pointer-events-none">
+    <div class="relative max-w-sm w-full flex flex-col items-center">
+      <button 
+        id="btnClosePamflet" 
+        type="button" 
+        class="self-end mb-2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center font-bold text-lg transition active:scale-90 cursor-pointer"
+        title="Tutup"
+      >
+        ✕
+      </button>
+      <img 
+        src="./pamflet.jpg" 
+        alt="Pamflet Dimsum Goreng Keju Lumer" 
+        class="w-full h-auto max-h-[80vh] object-contain rounded-2xl shadow-2xl border border-white/20"
+      />
+      <p class="text-[11px] text-neutral-400 mt-2">Ketuk di luar gambar untuk menutup</p>
+    </div>
+  </div>
 
   <!-- ==================== CLIENT INTERACTION JAVASCRIPT ==================== -->
   <script>
@@ -622,6 +654,42 @@ Mohon infonya ya kak, terima kasih! 🙏`;
       applyZoom(1.0);
       viewer.cameraOrbit = "0deg 55deg 110%";
       viewer.fieldOfView = "auto";
+    });
+
+    // ==================== PAMFLET LIGHTBOX MODAL ====================
+    const pamfletModal = document.getElementById("pamfletModal");
+    const btnOpenPamflet = document.getElementById("btnOpenPamflet");
+    const btnClosePamflet = document.getElementById("btnClosePamflet");
+
+    function openPamflet() {
+      pamfletModal.classList.remove("hidden", "pointer-events-none");
+      pamfletModal.classList.add("flex");
+      requestAnimationFrame(() => {
+        pamfletModal.classList.remove("opacity-0");
+      });
+      document.body.style.overflow = "hidden";
+    }
+
+    function closePamflet() {
+      pamfletModal.classList.add("opacity-0", "pointer-events-none");
+      setTimeout(() => {
+        pamfletModal.classList.remove("flex");
+        pamfletModal.classList.add("hidden");
+        if (currentZoom <= 1.02) {
+          document.body.style.overflow = "";
+        }
+      }, 300);
+    }
+
+    btnOpenPamflet.addEventListener("click", openPamflet);
+    btnClosePamflet.addEventListener("click", closePamflet);
+    pamfletModal.addEventListener("click", (e) => {
+      if (e.target === pamfletModal) closePamflet();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !pamfletModal.classList.contains("hidden")) {
+        closePamflet();
+      }
     });
   </script>
 </body>
