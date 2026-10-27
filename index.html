@@ -199,7 +199,7 @@
               disable-zoom
               disable-pan
               auto-rotate
-              rotation-per-second="25deg"
+              rotation-per-second="10deg"
               auto-rotate-delay="500"
               shadow-intensity="1.5"
               shadow-softness="0.8"
@@ -452,6 +452,50 @@ Mohon infonya ya kak, terima kasih! 🙏`;
     let currentZoom = 1.0;
     let zoomCooldownUntil = 0;
     let isPointerOn3D = false;
+    let hintHiddenByTimer = false;
+    let hintTimerId = null;
+    let hasLeftPage = false;
+
+    function startHintTimer(durationMs) {
+      clearTimeout(hintTimerId);
+      hintHiddenByTimer = false;
+      if (currentZoom <= 1.02) {
+        hint3D.classList.remove("opacity-0", "pointer-events-none");
+      }
+      hintTimerId = setTimeout(() => {
+        hintHiddenByTimer = true;
+        hint3D.classList.add("opacity-0", "pointer-events-none");
+      }, durationMs);
+    }
+
+    // Saat pertama buka: tampil 30 detik (atau 40 detik jika kembali lewat riwayat Back/Forward browser)
+    const navType = performance.getEntriesByType?.("navigation")?.[0]?.type;
+    startHintTimer(navType === "back_forward" ? 40000 : 30000);
+
+    // Jika user keluar tab / pindah web / ditimpa window lain lalu kembali, tampilkan lagi selama 40 detik
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        hasLeftPage = true;
+      } else if (document.visibilityState === "visible" && hasLeftPage) {
+        hasLeftPage = false;
+        startHintTimer(40000);
+      }
+    });
+
+    window.addEventListener("blur", () => { hasLeftPage = true; });
+    window.addEventListener("focus", () => {
+      if (hasLeftPage) {
+        hasLeftPage = false;
+        startHintTimer(40000);
+      }
+    });
+
+    window.addEventListener("pageshow", (e) => {
+      if (e.persisted) {
+        hasLeftPage = false;
+        startHintTimer(40000);
+      }
+    });
 
     // Pastikan internal canvas <model-viewer> selalu sinkron 100% dengan ukuran asli container walau sedang di-scale CSS
     const origGetRect = viewer.getBoundingClientRect.bind(viewer);
@@ -490,7 +534,9 @@ Mohon infonya ya kak, terima kasih! 🙏`;
       } else {
         stage3D.classList.remove("z-[100]");
         stage3D.classList.add("z-30");
-        hint3D.classList.remove("opacity-0", "pointer-events-none");
+        if (!hintHiddenByTimer) {
+          hint3D.classList.remove("opacity-0", "pointer-events-none");
+        }
         controls3D.classList.remove("opacity-0", "pointer-events-none");
         zoomStatusPill.classList.add("hidden");
         zoomStatusPill.classList.remove("flex");
