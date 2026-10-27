@@ -242,16 +242,6 @@
         </div>
       </div>
 
-      <!-- Tombol Indikator & Reset Saat 3D Sedang Zoom Pop-Out -->
-      <button
-        id="zoomStatusPill"
-        type="button"
-        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] hidden items-center gap-2 px-4 py-2 rounded-full bg-black/85 text-white text-xs font-bold border border-brand-orange/60 shadow-2xl backdrop-blur-md active:scale-95 transition"
-      >
-        <span id="zoomPercentText" class="text-brand-yellow">Zoom 150%</span>
-        <span>• Scroll Bawah / Klik untuk Zoom Out</span>
-      </button>
-
       <!-- ==================== BADGE HARGA & PROMO (Persis Gambar) ==================== -->
       <div class="relative z-20 mt-1 mb-6 px-2">
         <div class="bg-gradient-to-r from-amber-400 via-brand-yellow to-amber-500 text-brand-dark p-4 rounded-2xl shadow-2xl border-2 border-white/80 flex items-center justify-between gap-2">
@@ -451,8 +441,6 @@ Mohon infonya ya kak, terima kasih! 🙏`;
     const popoutWrap = document.getElementById("viewerPopoutWrap");
     const hint3D = document.getElementById("hint3D");
     const controls3D = document.getElementById("controls3D");
-    const zoomStatusPill = document.getElementById("zoomStatusPill");
-    const zoomPercentText = document.getElementById("zoomPercentText");
 
     const BASE_SCALE = 1.0; // Ukuran normal 100% tepat di tengah container 340px
     const MIN_ZOOM = 1.0;
@@ -535,9 +523,6 @@ Mohon infonya ya kak, terima kasih! 🙏`;
         stage3D.classList.add("z-[100]");
         hint3D.classList.add("opacity-0", "pointer-events-none");
         controls3D.classList.add("opacity-0", "pointer-events-none");
-        zoomStatusPill.classList.remove("hidden");
-        zoomStatusPill.classList.add("flex");
-        zoomPercentText.textContent = `Zoom ${Math.round(currentZoom * 100)}%`;
         document.documentElement.style.overflow = "hidden";
         document.body.style.overflow = "hidden";
       } else {
@@ -547,8 +532,6 @@ Mohon infonya ya kak, terima kasih! 🙏`;
           hint3D.classList.remove("opacity-0", "pointer-events-none");
         }
         controls3D.classList.remove("opacity-0", "pointer-events-none");
-        zoomStatusPill.classList.add("hidden");
-        zoomStatusPill.classList.remove("flex");
         document.documentElement.style.overflow = "";
         document.body.style.overflow = "";
       }
@@ -620,10 +603,6 @@ Mohon infonya ya kak, terima kasih! 🙏`;
     stage3D.addEventListener("dblclick", (e) => {
       e.preventDefault();
       applyZoom(currentZoom > 1.1 ? 1.0 : 2.4);
-    });
-
-    zoomStatusPill.addEventListener("click", () => {
-      applyZoom(1.0);
     });
 
     // 3D Controls
