@@ -155,6 +155,26 @@
       }
     }
 
+    @keyframes leafFall3 {
+      0% {
+        transform: translate3d(0, -12vh, 0) rotate(80deg);
+        opacity: 0;
+      }
+      12% {
+        opacity: 0.8;
+      }
+      40% {
+        transform: translate3d(26px, 38vh, 0) rotate(160deg);
+      }
+      70% {
+        transform: translate3d(-26px, 72vh, 0) rotate(270deg);
+      }
+      100% {
+        transform: translate3d(14px, 112vh, 0) rotate(380deg);
+        opacity: 0;
+      }
+    }
+
     .leaf-item {
       position: absolute;
       top: 0;
@@ -164,12 +184,18 @@
       will-change: transform;
     }
 
-    .leaf-1 { left: 6%;  width: 26px; animation: leafFall1 12s linear infinite; animation-delay: -2s;  opacity: 0.7; }
-    .leaf-2 { left: 28%; width: 36px; animation: leafFall2 15s ease-in-out infinite; animation-delay: -8s; opacity: 0.85; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
-    .leaf-3 { left: 58%; width: 30px; animation: leafFall1 13s linear infinite; animation-delay: -5s;  opacity: 0.75; }
-    .leaf-4 { left: 86%; width: 42px; animation: leafFall2 17s ease-in-out infinite; animation-delay: -12s; opacity: 0.8; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)); }
-    .leaf-5 { left: 16%; width: 22px; animation: leafFall1 16s linear infinite; animation-delay: -10s; opacity: 0.6; filter: blur(0.5px); }
-    .leaf-6 { left: 72%; width: 32px; animation: leafFall2 14s ease-in-out infinite; animation-delay: -4s;  opacity: 0.85; }
+    .leaf-1  { left: 5%;  width: 26px; animation: leafFall1 11s linear infinite; animation-delay: -1s;  opacity: 0.7; }
+    .leaf-2  { left: 24%; width: 36px; animation: leafFall2 14s ease-in-out infinite; animation-delay: -6s; opacity: 0.85; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+    .leaf-3  { left: 52%; width: 30px; animation: leafFall3 12s ease-in-out infinite; animation-delay: -4s; opacity: 0.75; }
+    .leaf-4  { left: 82%; width: 42px; animation: leafFall2 15s ease-in-out infinite; animation-delay: -10s; opacity: 0.8; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)); }
+    .leaf-5  { left: 14%; width: 22px; animation: leafFall1 13s linear infinite; animation-delay: -8s;  opacity: 0.6; filter: blur(0.5px); }
+    .leaf-6  { left: 68%; width: 32px; animation: leafFall3 14s ease-in-out infinite; animation-delay: -3s;  opacity: 0.85; }
+    .leaf-7  { left: 38%; width: 28px; animation: leafFall1 10s linear infinite; animation-delay: -5s;  opacity: 0.75; }
+    .leaf-8  { left: 92%; width: 34px; animation: leafFall2 13s ease-in-out infinite; animation-delay: -2s;  opacity: 0.7; }
+    .leaf-9  { left: 18%; width: 38px; animation: leafFall3 16s ease-in-out infinite; animation-delay: -12s; opacity: 0.8; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
+    .leaf-10 { left: 45%; width: 24px; animation: leafFall1 14s linear infinite; animation-delay: -9s;  opacity: 0.65; filter: blur(0.6px); }
+    .leaf-11 { left: 60%; width: 40px; animation: leafFall2 12s ease-in-out infinite; animation-delay: -7s;  opacity: 0.85; }
+    .leaf-12 { left: 78%; width: 26px; animation: leafFall3 11s ease-in-out infinite; animation-delay: -11s; opacity: 0.7; }
   </style>
 </head>
 
@@ -183,6 +209,12 @@
     <img src="./leaf1.png" alt="" class="leaf-item leaf-4" />
     <img src="./leaf2.png" alt="" class="leaf-item leaf-5" />
     <img src="./leaf3.png" alt="" class="leaf-item leaf-6" />
+    <img src="./leaf1.png" alt="" class="leaf-item leaf-7" />
+    <img src="./leaf2.png" alt="" class="leaf-item leaf-8" />
+    <img src="./leaf3.png" alt="" class="leaf-item leaf-9" />
+    <img src="./leaf1.png" alt="" class="leaf-item leaf-10" />
+    <img src="./leaf2.png" alt="" class="leaf-item leaf-11" />
+    <img src="./leaf3.png" alt="" class="leaf-item leaf-12" />
   </div>
 
   <!-- ==================== HEADER BAR ==================== -->
