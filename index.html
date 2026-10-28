@@ -443,6 +443,42 @@
           </div>
         </div>
 
+        <!-- Info Rekening Pembayaran (1-Klik Salin) -->
+        <div class="bg-black/40 border border-white/10 rounded-2xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-neutral-300">Rekening Pembayaran:</span>
+            <span class="text-[10px] text-amber-300/80">Tap tombol untuk salin</span>
+          </div>
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between bg-neutral-900/90 border border-white/5 px-3 py-2 rounded-xl">
+              <div>
+                <span class="font-bold text-xs text-white block">BRI: 656001058176534</span>
+                <span class="text-[10px] text-neutral-400">a/n Aprilia Jennis Pertiwi</span>
+              </div>
+              <button 
+                type="button" 
+                onclick="copyRekening('656001058176534', this)" 
+                class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-lg text-[11px] font-bold active:scale-95 transition"
+              >
+                Salin
+              </button>
+            </div>
+            <div class="flex items-center justify-between bg-neutral-900/90 border border-white/5 px-3 py-2 rounded-xl">
+              <div>
+                <span class="font-bold text-xs text-white block">BCA: 4730886689</span>
+                <span class="text-[10px] text-neutral-400">a/n Rahmat Saputra</span>
+              </div>
+              <button 
+                type="button" 
+                onclick="copyRekening('4730886689', this)" 
+                class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-lg text-[11px] font-bold active:scale-95 transition"
+              >
+                Salin
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Tombol Utama Pesan Sekarang (WhatsApp) Sesuai Poster -->
         <button 
           id="btnOrderWA" 
@@ -546,6 +582,43 @@
       updatePrice();
     });
 
+    function copyRekening(number, btn) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(number).then(() => {
+          showCopySuccess(btn);
+        }).catch(() => {
+          fallbackCopy(number, btn);
+        });
+      } else {
+        fallbackCopy(number, btn);
+      }
+    }
+
+    function fallbackCopy(number, btn) {
+      const ta = document.createElement("textarea");
+      ta.value = number;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand("copy");
+        showCopySuccess(btn);
+      } catch (_) {}
+      document.body.removeChild(ta);
+    }
+
+    function showCopySuccess(btn) {
+      const orig = btn.textContent;
+      btn.textContent = "Tersalin! ✓";
+      btn.classList.add("!text-green-400", "!border-green-500/40", "!bg-green-500/20");
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.classList.remove("!text-green-400", "!border-green-500/40", "!bg-green-500/20");
+      }, 2000);
+    }
+
     function sendWhatsAppOrder() {
       const total = qty * PRICE_PER_PORTION;
       const catatan = catatanInput.value.trim() || "-";
@@ -560,8 +633,12 @@ Detail Pesanan:
 • Total Harga: Rp ${total.toLocaleString("id-ID")}
 
 Rekening Pembayaran:
-• BRI: \`656001058176534\` (a/n Aprilia Jennis Pertiwi)
-• BCA: \`4730886689\` (a/n Rahmat Saputra)
+
+BRI (a/n Aprilia Jennis Pertiwi):
+656001058176534
+
+BCA (a/n Rahmat Saputra):
+4730886689
 
 Bukti pembayaran akan segera saya kirimkan ke sini ya kak 🙏
 
