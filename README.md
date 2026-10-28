@@ -19,3 +19,6 @@ Landing page interaktif 3D untuk bisnis **Dimsum Goreng Keju Lumer** milik Putra
 - **WhatsApp Penjual:** `089669700178` (6289669700178)
 - **Produk:** Dimsum Goreng Keju Lumer (Isi 5 pcs)
 - **Harga:** Rp 20.000 / porsi
+- **Rekening Pembayaran:**
+  - BRI: `656001058176534` a/n Aprilia Jennis Pertiwi
+  - BCA: `4730886689` a/n Rahmat Saputra
