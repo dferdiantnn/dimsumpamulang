@@ -113,10 +113,77 @@
       background: #ff5400;
       border-radius: 9999px;
     }
+
+    /* ==================== EFEK DAUN BERGUGURAN (60 FPS GPU-ACCELERATED) ==================== */
+    @keyframes leafFall1 {
+      0% {
+        transform: translate3d(0, -12vh, 0) rotate(0deg) rotateY(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.85;
+      }
+      50% {
+        transform: translate3d(32px, 50vh, 0) rotate(160deg) rotateY(140deg);
+      }
+      90% {
+        opacity: 0.85;
+      }
+      100% {
+        transform: translate3d(-18px, 112vh, 0) rotate(320deg) rotateY(280deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes leafFall2 {
+      0% {
+        transform: translate3d(0, -12vh, 0) rotate(35deg);
+        opacity: 0;
+      }
+      15% {
+        opacity: 0.75;
+      }
+      45% {
+        transform: translate3d(-38px, 46vh, 0) rotate(190deg);
+      }
+      75% {
+        transform: translate3d(24px, 80vh, 0) rotate(310deg);
+      }
+      100% {
+        transform: translate3d(-10px, 112vh, 0) rotate(410deg);
+        opacity: 0;
+      }
+    }
+
+    .leaf-item {
+      position: absolute;
+      top: 0;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      will-change: transform;
+    }
+
+    .leaf-1 { left: 6%;  width: 26px; animation: leafFall1 12s linear infinite; animation-delay: -2s;  opacity: 0.7; }
+    .leaf-2 { left: 28%; width: 36px; animation: leafFall2 15s ease-in-out infinite; animation-delay: -8s; opacity: 0.85; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+    .leaf-3 { left: 58%; width: 30px; animation: leafFall1 13s linear infinite; animation-delay: -5s;  opacity: 0.75; }
+    .leaf-4 { left: 86%; width: 42px; animation: leafFall2 17s ease-in-out infinite; animation-delay: -12s; opacity: 0.8; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)); }
+    .leaf-5 { left: 16%; width: 22px; animation: leafFall1 16s linear infinite; animation-delay: -10s; opacity: 0.6; filter: blur(0.5px); }
+    .leaf-6 { left: 72%; width: 32px; animation: leafFall2 14s ease-in-out infinite; animation-delay: -4s;  opacity: 0.85; }
   </style>
 </head>
 
 <body class="bg-brand-dark text-white font-sans antialiased selection:bg-brand-orange selection:text-white pb-28 md:pb-16 overflow-x-hidden">
+
+  <!-- ==================== AMBIENT DAUN BERGUGURAN (MELAYANG DI BACKGROUND) ==================== -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-10" aria-hidden="true">
+    <img src="./leaf1.png" alt="" class="leaf-item leaf-1" />
+    <img src="./leaf2.png" alt="" class="leaf-item leaf-2" />
+    <img src="./leaf3.png" alt="" class="leaf-item leaf-3" />
+    <img src="./leaf1.png" alt="" class="leaf-item leaf-4" />
+    <img src="./leaf2.png" alt="" class="leaf-item leaf-5" />
+    <img src="./leaf3.png" alt="" class="leaf-item leaf-6" />
+  </div>
 
   <!-- ==================== HEADER BAR ==================== -->
   <header class="fixed top-0 inset-x-0 z-50 bg-black/60 backdrop-blur-md border-b border-white/10">
