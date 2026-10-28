@@ -19,4 +19,3 @@ Landing page interaktif 3D untuk bisnis **Dimsum Goreng Keju Lumer** milik Putra
 - **WhatsApp Penjual:** `089669700178` (6289669700178)
 - **Produk:** Dimsum Goreng Keju Lumer (Isi 5 pcs)
 - **Harga:** Rp 20.000 / porsi
-- **Add-on:** Saus Chilli Oil (Rp 2.000 / sachet)
