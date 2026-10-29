@@ -144,15 +144,21 @@
     <!-- ==================== KPI DASHBOARD CARDS ==================== -->
     <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
       <!-- Modal Awal -->
-      <div class="bg-brand-card/90 border border-white/10 rounded-2xl p-3 text-center print-card">
-        <span class="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider block">Modal Awal</span>
-        <span id="kpiModalAwal" class="font-price font-bold text-base sm:text-lg text-white block mt-0.5">Rp 50.000</span>
+      <div class="bg-brand-card/90 border border-white/10 rounded-2xl p-3 text-center print-card relative">
+        <div class="flex items-center justify-center gap-1">
+          <span class="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider block">Modal Awal</span>
+          <button onclick="editModalAwal()" type="button" class="text-[10px] text-neutral-400 hover:text-brand-yellow no-print" title="Ubah Modal Awal">✏️</button>
+        </div>
+        <span id="kpiModalAwal" class="font-price font-bold text-base sm:text-lg text-white block mt-0.5 cursor-pointer" onclick="editModalAwal()" title="Klik untuk ubah">Rp 50.000</span>
       </div>
 
       <!-- Sisa Modal -->
-      <div class="bg-brand-card/90 border border-white/10 rounded-2xl p-3 text-center print-card">
-        <span class="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider block">Sisa Modal</span>
-        <span id="kpiSisaModal" class="font-price font-bold text-base sm:text-lg text-emerald-400 block mt-0.5">Rp 50.000</span>
+      <div class="bg-brand-card/90 border border-white/10 rounded-2xl p-3 text-center print-card relative">
+        <div class="flex items-center justify-center gap-1">
+          <span class="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider block">Sisa Modal</span>
+          <button onclick="editSisaModal()" type="button" class="text-[10px] text-neutral-400 hover:text-emerald-400 no-print" title="Ubah Sisa Modal">✏️</button>
+        </div>
+        <span id="kpiSisaModal" class="font-price font-bold text-base sm:text-lg text-emerald-400 block mt-0.5 cursor-pointer" onclick="editSisaModal()" title="Klik untuk ubah">Rp 50.000</span>
       </div>
 
       <!-- Total Porsi -->
@@ -175,9 +181,12 @@
       </div>
 
       <!-- Target Omset -->
-      <div class="bg-brand-card/90 border border-white/10 rounded-2xl p-3 text-center print-card">
-        <span class="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider block">Target Omset</span>
-        <span id="kpiTargetOmset" class="font-price font-bold text-base sm:text-lg text-sky-400 block mt-0.5">Rp 620.000</span>
+      <div class="bg-brand-card/90 border border-white/10 rounded-2xl p-3 text-center print-card relative">
+        <div class="flex items-center justify-center gap-1">
+          <span class="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider block">Target Omset</span>
+          <button onclick="editTargetOmset()" type="button" class="text-[10px] text-neutral-400 hover:text-sky-400 no-print" title="Ubah Target">✏️</button>
+        </div>
+        <span id="kpiTargetOmset" class="font-price font-bold text-base sm:text-lg text-sky-400 block mt-0.5 cursor-pointer" onclick="editTargetOmset()" title="Klik untuk ubah">Rp 620.000</span>
       </div>
     </section>
 
@@ -384,10 +393,12 @@
   <!-- ==================== JAVASCRIPT APP LOGIC ==================== -->
   <script>
     const PRICE_PER_PORTION = 20000;
-    const TARGET_OMSET = 620000;
-    const MODAL_AWAL = 50000;
     const STORAGE_KEY = "dimsum_pembukuan_trx_v2";
     const WEBHOOK_KEY = "dimsum_webhook_url";
+
+    let modalAwal = parseInt(localStorage.getItem("dimsum_modal_awal"), 10) || 50000;
+    let sisaModal = parseInt(localStorage.getItem("dimsum_sisa_modal"), 10) || 50000;
+    let targetOmset = parseInt(localStorage.getItem("dimsum_target_omset"), 10) || 620000;
 
     // State
     let transactions = [];
@@ -584,6 +595,64 @@
       updateFormPreview();
     });
 
+    // Edit Modal & Target
+    window.editModalAwal = function() {
+      const input = prompt("Masukkan Jumlah Modal Awal (Rp):", modalAwal);
+      if (input !== null) {
+        const val = parseInt(input.replace(/[^0-9]/g, ""), 10);
+        if (!isNaN(val) && val >= 0) {
+          modalAwal = val;
+          localStorage.setItem("dimsum_modal_awal", val);
+          syncModalToSheet();
+          renderApp();
+          showToast(`Modal Awal diubah: Rp ${val.toLocaleString("id-ID")}`);
+        }
+      }
+    };
+
+    window.editSisaModal = function() {
+      const input = prompt("Masukkan Jumlah Sisa Modal (Rp):", sisaModal);
+      if (input !== null) {
+        const val = parseInt(input.replace(/[^0-9]/g, ""), 10);
+        if (!isNaN(val) && val >= 0) {
+          sisaModal = val;
+          localStorage.setItem("dimsum_sisa_modal", val);
+          syncModalToSheet();
+          renderApp();
+          showToast(`Sisa Modal diubah: Rp ${val.toLocaleString("id-ID")}`);
+        }
+      }
+    };
+
+    window.editTargetOmset = function() {
+      const input = prompt("Masukkan Target Omset (Rp):", targetOmset);
+      if (input !== null) {
+        const val = parseInt(input.replace(/[^0-9]/g, ""), 10);
+        if (!isNaN(val) && val > 0) {
+          targetOmset = val;
+          localStorage.setItem("dimsum_target_omset", val);
+          renderApp();
+          showToast(`Target Omset diubah: Rp ${val.toLocaleString("id-ID")}`);
+        }
+      }
+    };
+
+    async function syncModalToSheet() {
+      if (!webhookUrl) return;
+      try {
+        await fetch(webhookUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "update_modal",
+            modalAwal: modalAwal,
+            sisaModal: sisaModal
+          })
+        });
+      } catch (_) {}
+    }
+
     // Delete Transaction
     window.deleteTrx = function(id) {
       if (confirm("Hapus transaksi ini dari aplikasi?")) {
@@ -640,11 +709,14 @@
       }
 
       // Update KPI
+      kpiModalAwal.textContent = "Rp " + modalAwal.toLocaleString("id-ID");
+      kpiSisaModal.textContent = "Rp " + sisaModal.toLocaleString("id-ID");
+      kpiTargetOmset.textContent = "Rp " + targetOmset.toLocaleString("id-ID");
       kpiTotalPorsi.textContent = totalPorsiSum + " Porsi";
       kpiTotalPcs.textContent = `(${totalPcsSum} pcs)`;
       kpiTotalOmset.textContent = "Rp " + totalOmsetSum.toLocaleString("id-ID");
 
-      const labaBersih = totalOmsetSum - MODAL_AWAL;
+      const labaBersih = totalOmsetSum - modalAwal;
       kpiLabaBersih.textContent = "Rp " + labaBersih.toLocaleString("id-ID");
       if (labaBersih >= 0) {
         kpiLabaBersih.className = "font-price font-bold text-base sm:text-lg text-emerald-300 block mt-0.5";
@@ -653,9 +725,9 @@
       }
 
       // Target Progress
-      const pct = Math.min(100, Math.round((totalOmsetSum / TARGET_OMSET) * 100));
+      const pct = Math.min(100, Math.round((totalOmsetSum / targetOmset) * 100));
       progressBar.style.width = pct + "%";
-      progressText.textContent = pct + "% (Rp " + totalOmsetSum.toLocaleString("id-ID") + " / Rp 620.000)";
+      progressText.textContent = pct + "% (Rp " + totalOmsetSum.toLocaleString("id-ID") + " / Rp " + targetOmset.toLocaleString("id-ID") + ")";
 
       // Footer
       footTotalPorsi.textContent = totalPorsiSum + " Porsi";
