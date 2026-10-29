@@ -269,10 +269,11 @@
               id="inputMetode" 
               class="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-orange transition"
             >
-              <option value="BCA">BCA (a/n Rahmat Saputra)</option>
-              <option value="BRI">BRI (a/n Aprilia Jennis Pertiwi)</option>
-              <option value="Cash">Cash / Tunai</option>
-              <option value="QRIS">QRIS / Lainnya</option>
+              <option value="TF Putra">TF Putra (BCA a/n Rahmat Saputra)</option>
+              <option value="TF Jennis">TF Jennis (BRI a/n Aprilia Jennis Pertiwi)</option>
+              <option value="Cash Putra">Cash Putra</option>
+              <option value="Cash Jennis">Cash Jennis</option>
+              <option value="Lainnya">QRIS / Lainnya</option>
             </select>
           </div>
         </div>
@@ -574,13 +575,23 @@
       const parts = rawDate.split("-");
       const formattedDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : rawDate;
 
+      // Sesuaikan metode bayar dengan aturan validasi kolom E spreadsheet
+      let metodeSheet = inputMetode.value;
+      const validMetode = ["TF Jennis", "TF Putra", "Cash Jennis", "Cash Putra", "Lainnya"];
+      if (!validMetode.includes(metodeSheet)) {
+        if (metodeSheet === "BCA") metodeSheet = "TF Putra";
+        else if (metodeSheet === "BRI") metodeSheet = "TF Jennis";
+        else if (metodeSheet === "Cash") metodeSheet = "Cash Putra";
+        else metodeSheet = "Lainnya";
+      }
+
       const newTrx = {
         id: Date.now(),
         tanggal: formattedDate,
         porsi: porsi,
         pcs: pcs,
         total: total,
-        metode: inputMetode.value,
+        metode: metodeSheet,
         catatan: inputCatatan.value.trim() || "-"
       };
 
