@@ -3,6 +3,8 @@
 Landing page interaktif 3D untuk bisnis **Dimsum Goreng Keju Lumer** milik Putra.
 
 ## 🌐 Website Live
+- **Cloudflare Pages:** [https://dimsumgoreng.pages.dev](https://dimsumgoreng.pages.dev)
+- **Aplikasi Pembukuan:** [https://dimsumgoreng.pages.dev/pembukuan](https://dimsumgoreng.pages.dev/pembukuan)
 - **GitHub Pages:** [https://dferdiantnn.github.io/dimsumpamulang/](https://dferdiantnn.github.io/dimsumpamulang/)
 - **Repository:** [https://github.com/dferdiantnn/dimsumpamulang](https://github.com/dferdiantnn/dimsumpamulang)
 - **Branch:** `main`
