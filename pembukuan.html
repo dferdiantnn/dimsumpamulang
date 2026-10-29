@@ -842,30 +842,66 @@
       }
     });
 
-    // 2-Way Sync: Live Fetch from Google Sheet
+    // 2-Way Sync: Live Fetch directly from Google Sheet (via Google Visualization API)
     const btnSyncSheet = document.getElementById("btnSyncSheet");
     const syncIcon = document.getElementById("syncIcon");
+    const SPREADSHEET_ID = "1-GEWMahwzBR6S19Vg9UpvZeK10ROzVaVovvFlUDPIok";
+    const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
 
     async function fetchLiveFromSheet(showFeedback = false) {
-      if (!webhookUrl) return;
       if (syncIcon) syncIcon.classList.add("animate-spin");
       try {
-        const res = await fetch(webhookUrl);
-        const data = await res.json();
-        if (data.status === "success" && Array.isArray(data.transactions)) {
-          transactions = data.transactions;
-          if (typeof data.modalAwal === "number" && data.modalAwal > 0) {
-            modalAwal = data.modalAwal;
-            localStorage.setItem("dimsum_modal_awal", modalAwal);
-          }
-          if (typeof data.sisaModal === "number") {
-            sisaModal = data.sisaModal;
+        const res = await fetch(GVIZ_URL);
+        const text = await res.text();
+        const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+        const data = JSON.parse(jsonStr);
+        const rows = data.table?.rows || [];
+
+        // KPI dari baris pertama sheet
+        if (rows[0] && rows[0].c) {
+          const sModal = rows[0].c[1]?.v;
+          const tOmset = rows[0].c[2]?.v;
+          if (typeof sModal === "number") {
+            sisaModal = sModal;
             localStorage.setItem("dimsum_sisa_modal", sisaModal);
           }
-          saveData();
-          renderApp();
-          if (showFeedback) showToast("✓ Data live dari Spreadsheet berhasil ditarik!");
         }
+
+        // Baca seluruh transaksi yang ada di Google Sheet
+        const liveTrx = [];
+        for (let i = 2; i < rows.length; i++) {
+          const c = rows[i]?.c;
+          if (!c) continue;
+          const tglCell = c[0];
+          const porsiCell = c[1];
+          if (!tglCell && !porsiCell) continue;
+
+          let tanggal = tglCell ? (tglCell.f || tglCell.v || "") : "";
+          const porsi = porsiCell ? Number(porsiCell.v || 0) : 0;
+          if (porsi === 0 && !tanggal) continue;
+
+          const pcs = c[2] ? Number(c[2].v || porsi * 5) : porsi * 5;
+          const total = c[3] ? Number(c[3].v || porsi * 20000) : porsi * 20000;
+          const metode = c[4] ? (c[4].v || "Cash") : "Cash";
+          const catatan = c[5] ? (c[5].v || "-") : "-";
+
+          const sheetRow = i + 6;
+          liveTrx.push({
+            id: sheetRow,
+            row: sheetRow,
+            tanggal: tanggal,
+            porsi: porsi,
+            pcs: pcs,
+            total: total,
+            metode: metode,
+            catatan: catatan
+          });
+        }
+
+        transactions = liveTrx;
+        saveData();
+        renderApp();
+        if (showFeedback) showToast("✓ Data live dari Spreadsheet berhasil ditarik!");
       } catch (err) {
         if (showFeedback) showToast("Gagal menarik data live dari Spreadsheet", false);
       } finally {
