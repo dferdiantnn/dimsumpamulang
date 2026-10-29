@@ -79,6 +79,14 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
+        <button 
+          id="btnSyncSheet" 
+          type="button" 
+          class="text-xs px-2.5 py-1.5 rounded-xl bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 font-bold border border-sky-500/40 transition flex items-center gap-1.5 shadow-sm active:scale-95"
+          title="Tarik data terbaru dari Google Spreadsheet secara real-time"
+        >
+          <span id="syncIcon">🔄</span> <span class="hidden sm:inline">Sync Live</span>
+        </button>
         <a 
           href="https://docs.google.com/spreadsheets/d/1-GEWMahwzBR6S19Vg9UpvZeK10ROzVaVovvFlUDPIok/edit?usp=sharing" 
           target="_blank" 
@@ -613,6 +621,7 @@
             body: JSON.stringify(newTrx)
           });
           showToast("✓ Berhasil disimpan & tersinkron ke Google Sheet!");
+          setTimeout(() => fetchLiveFromSheet(false), 1500);
         } catch (err) {
           showToast("Data tersimpan di HP, tapi gagal sinkron ke Google Sheet", false);
         } finally {
@@ -687,12 +696,24 @@
       } catch (_) {}
     }
 
-    // Delete Transaction
-    window.deleteTrx = function(id) {
-      if (confirm("Hapus transaksi ini dari aplikasi?")) {
+    // Delete Transaction (Web & Google Sheet)
+    window.deleteTrx = async function(id, rowNumber) {
+      if (confirm("Hapus transaksi ini dari Spreadsheet dan Web?")) {
         transactions = transactions.filter(t => t.id !== id);
         saveData();
         renderApp();
+        if (webhookUrl && rowNumber) {
+          try {
+            await fetch(webhookUrl, {
+              method: "POST",
+              mode: "no-cors",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "delete", row: rowNumber })
+            });
+            showToast("✓ Transaksi dihapus dari Spreadsheet!");
+            setTimeout(() => fetchLiveFromSheet(false), 1500);
+          } catch (_) {}
+        }
       }
     };
 
@@ -724,8 +745,8 @@
             <td class="py-2.5 px-3 text-right font-price font-bold text-brand-yellow">Rp ${t.total.toLocaleString("id-ID")}</td>
             <td class="py-2.5 px-3">
               <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                t.metode === 'BCA' ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' :
-                t.metode === 'BRI' ? 'bg-sky-600/20 text-sky-400 border border-sky-500/30' :
+                t.metode && t.metode.includes('Putra') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' :
+                t.metode && t.metode.includes('Jennis') ? 'bg-sky-600/20 text-sky-400 border border-sky-500/30' :
                 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
               }">
                 ${t.metode}
@@ -733,7 +754,7 @@
             </td>
             <td class="py-2.5 px-3 text-neutral-400 text-[11px] max-w-[140px] truncate" title="${t.catatan}">${t.catatan}</td>
             <td class="py-2.5 px-3 text-center no-print">
-              <button onclick="deleteTrx(${t.id})" class="text-neutral-500 hover:text-red-400 text-xs px-2 py-1 rounded transition" title="Hapus">
+              <button onclick="deleteTrx(${t.id}, ${t.row || 0})" class="text-neutral-500 hover:text-red-400 text-xs px-2 py-1 rounded transition" title="Hapus dari Web & Sheet">
                 ✕
               </button>
             </td>
@@ -798,18 +819,68 @@
       window.print();
     });
 
-    // Reset Data
-    btnResetData.addEventListener("click", () => {
-      if (confirm("Yakin ingin menghapus seluruh riwayat transaksi di aplikasi ini?")) {
+    // Reset Data (Web & Spreadsheet)
+    btnResetData.addEventListener("click", async () => {
+      if (confirm("Apakah Anda yakin ingin MENGOSONGKAN SELURUH TRANSAKSI di Spreadsheet dan Web? (Data di sheet akan diarsipkan otomatis).")) {
         transactions = [];
         saveData();
         renderApp();
+        if (webhookUrl) {
+          try {
+            await fetch(webhookUrl, {
+              method: "POST",
+              mode: "no-cors",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "reset" })
+            });
+            showToast("✓ Spreadsheet & Web berhasil direset!");
+            setTimeout(() => fetchLiveFromSheet(false), 1500);
+          } catch (_) {
+            showToast("Web direset, tapi gagal kirim perintah reset ke sheet", false);
+          }
+        }
       }
     });
+
+    // 2-Way Sync: Live Fetch from Google Sheet
+    const btnSyncSheet = document.getElementById("btnSyncSheet");
+    const syncIcon = document.getElementById("syncIcon");
+
+    async function fetchLiveFromSheet(showFeedback = false) {
+      if (!webhookUrl) return;
+      if (syncIcon) syncIcon.classList.add("animate-spin");
+      try {
+        const res = await fetch(webhookUrl);
+        const data = await res.json();
+        if (data.status === "success" && Array.isArray(data.transactions)) {
+          transactions = data.transactions;
+          if (typeof data.modalAwal === "number" && data.modalAwal > 0) {
+            modalAwal = data.modalAwal;
+            localStorage.setItem("dimsum_modal_awal", modalAwal);
+          }
+          if (typeof data.sisaModal === "number") {
+            sisaModal = data.sisaModal;
+            localStorage.setItem("dimsum_sisa_modal", sisaModal);
+          }
+          saveData();
+          renderApp();
+          if (showFeedback) showToast("✓ Data live dari Spreadsheet berhasil ditarik!");
+        }
+      } catch (err) {
+        if (showFeedback) showToast("Gagal menarik data live dari Spreadsheet", false);
+      } finally {
+        if (syncIcon) syncIcon.classList.remove("animate-spin");
+      }
+    }
+
+    if (btnSyncSheet) {
+      btnSyncSheet.addEventListener("click", () => fetchLiveFromSheet(true));
+    }
 
     // Initial run
     loadData();
     updateFormPreview();
+    fetchLiveFromSheet(false);
   </script>
 </body>
 </html>
