@@ -395,6 +395,7 @@
     const PRICE_PER_PORTION = 20000;
     const STORAGE_KEY = "dimsum_pembukuan_trx_v2";
     const WEBHOOK_KEY = "dimsum_webhook_url";
+    const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx0lOMt-DWoooaGpcDtPm7S73pI_Nbj8lOj-jHzU_Iv0Zkw6thdlCni0l48_HU2EX-f/exec";
 
     let modalAwal = parseInt(localStorage.getItem("dimsum_modal_awal"), 10) || 50000;
     let sisaModal = parseInt(localStorage.getItem("dimsum_sisa_modal"), 10) || 50000;
@@ -402,7 +403,8 @@
 
     // State
     let transactions = [];
-    let webhookUrl = localStorage.getItem(WEBHOOK_KEY) || "";
+    const savedWebhook = localStorage.getItem(WEBHOOK_KEY);
+    let webhookUrl = (savedWebhook && savedWebhook.trim() !== "") ? savedWebhook : DEFAULT_WEBHOOK_URL;
 
     // DOM Elements
     const formTransaksi = document.getElementById("formTransaksi");
