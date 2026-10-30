@@ -711,9 +711,54 @@
               body: JSON.stringify({ action: "delete", row: rowNumber })
             });
             showToast("✓ Transaksi dihapus dari Spreadsheet!");
-            setTimeout(() => fetchLiveFromSheet(false), 1500);
+            setTimeout(() => fetchLiveFromSheet(false), 1200);
           } catch (_) {}
         }
+      }
+    };
+
+    // Edit Transaction (Web & Google Sheet)
+    window.editTrx = async function(id, rowNumber) {
+      const trx = transactions.find(t => t.id === id);
+      if (!trx) return;
+      const newPorsiStr = prompt("Ubah Jumlah Porsi (PAC):", trx.porsi);
+      if (newPorsiStr === null) return;
+      const newPorsi = parseInt(newPorsiStr, 10);
+      if (isNaN(newPorsi) || newPorsi < 1) {
+        alert("Jumlah porsi tidak valid!");
+        return;
+      }
+      const newMetode = prompt("Metode Bayar (TF Putra / TF Jennis / Cash Putra / Cash Jennis / Lainnya):", trx.metode);
+      if (newMetode === null) return;
+      const newCatatan = prompt("Catatan:", trx.catatan === "-" ? "" : trx.catatan);
+      if (newCatatan === null) return;
+
+      trx.porsi = newPorsi;
+      trx.pcs = newPorsi * 5;
+      trx.total = newPorsi * PRICE_PER_PORTION;
+      trx.metode = newMetode.trim() || trx.metode;
+      trx.catatan = newCatatan.trim() || "-";
+
+      saveData();
+      renderApp();
+
+      if (webhookUrl && rowNumber) {
+        try {
+          await fetch(webhookUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "update",
+              row: rowNumber,
+              porsi: trx.porsi,
+              metode: trx.metode,
+              catatan: trx.catatan
+            })
+          });
+          showToast("✓ Transaksi berhasil diupdate di Spreadsheet!");
+          setTimeout(() => fetchLiveFromSheet(false), 1200);
+        } catch (_) {}
       }
     };
 
@@ -753,8 +798,11 @@
               </span>
             </td>
             <td class="py-2.5 px-3 text-neutral-400 text-[11px] max-w-[140px] truncate" title="${t.catatan}">${t.catatan}</td>
-            <td class="py-2.5 px-3 text-center no-print">
-              <button onclick="deleteTrx(${t.id}, ${t.row || 0})" class="text-neutral-500 hover:text-red-400 text-xs px-2 py-1 rounded transition" title="Hapus dari Web & Sheet">
+            <td class="py-2.5 px-3 text-center no-print whitespace-nowrap">
+              <button onclick="editTrx(${t.id}, ${t.row || 0})" class="text-neutral-400 hover:text-brand-yellow text-xs px-1.5 py-1 rounded transition" title="Edit Transaksi">
+                ✏️
+              </button>
+              <button onclick="deleteTrx(${t.id}, ${t.row || 0})" class="text-neutral-500 hover:text-red-400 text-xs px-1.5 py-1 rounded transition" title="Hapus dari Web & Sheet">
                 ✕
               </button>
             </td>
@@ -851,7 +899,7 @@
     async function fetchLiveFromSheet(showFeedback = false) {
       if (syncIcon) syncIcon.classList.add("animate-spin");
       try {
-        const res = await fetch(GVIZ_URL);
+        const res = await fetch(`${GVIZ_URL}&t=${Date.now()}`);
         const text = await res.text();
         const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
         const data = JSON.parse(jsonStr);
