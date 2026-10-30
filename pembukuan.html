@@ -433,8 +433,8 @@
 
     // State
     let transactions = [];
-    const savedWebhook = localStorage.getItem(WEBHOOK_KEY);
-    let webhookUrl = (savedWebhook && savedWebhook.trim() !== "") ? savedWebhook : DEFAULT_WEBHOOK_URL;
+    localStorage.setItem(WEBHOOK_KEY, DEFAULT_WEBHOOK_URL);
+    let webhookUrl = DEFAULT_WEBHOOK_URL;
 
     // DOM Elements
     const formTransaksi = document.getElementById("formTransaksi");
